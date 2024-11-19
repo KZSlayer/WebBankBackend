@@ -33,6 +33,7 @@ namespace Identity.Models
         public string PhoneNumber { get; set; }
 
         [Required]
+        [StringLength(255)]
         public string PasswordHash { get; set; }
 
         [Required]
