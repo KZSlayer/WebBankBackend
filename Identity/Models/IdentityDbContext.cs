@@ -3,9 +3,12 @@ namespace Identity.Models
 {
     public class IdentityDbContext : DbContext
     {
-        public IdentityDbContext(DbContextOptions<IdentityDbContext> options):base(options) { }
         public DbSet<User> users { get; set; }
         public DbSet<RefreshToken> refresh_tokens { get; set; }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=WebBank_IdentityDB;Username=postgres;Password=nvidia123");
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
