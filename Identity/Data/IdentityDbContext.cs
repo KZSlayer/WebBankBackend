@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-namespace Identity.Models
+﻿using Identity.Models;
+using Microsoft.EntityFrameworkCore;
+namespace Identity.Data
 {
     public class IdentityDbContext : DbContext
     {
