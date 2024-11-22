@@ -15,6 +15,10 @@ namespace Identity.Models
         public int UserId { get; set; }
 
         [Required]
+        [StringLength(64)]
+        public string DeviceID { get; set; }
+
+        [Required]
         [StringLength(500)]
         public string Token { get; set; }
 

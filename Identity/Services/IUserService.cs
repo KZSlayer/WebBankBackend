@@ -10,5 +10,6 @@ namespace Identity.Services
         Task CreateUserAsync(User user);
         User ConvertToUser(SignUpDTO signUpDTO);
         string HashPassword(string password);
+        bool CheckPasswordAsync(User user, string password);
     }
 }

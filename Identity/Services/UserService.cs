@@ -57,5 +57,10 @@ namespace Identity.Services
             var user = new User();
             return _passwordHasher.HashPassword(user,password);
         }
+        public bool CheckPasswordAsync(User user, string password)
+        {
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
+            return result == PasswordVerificationResult.Success;
+        }
     }
 }
