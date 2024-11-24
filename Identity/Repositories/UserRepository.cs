@@ -1,5 +1,6 @@
 ﻿using Identity.Data;
 using Identity.Models;
+using Identity.Repositories.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -14,8 +15,15 @@ namespace Identity.Repositories
         }
         public async Task AddUserAsync(User user)
         {
-            await _context.users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new UserSaveFailedException("Не удалось сохранить пользователя в базе данных.");
+            }
         }
 
         public async Task<User> FindByEmailAsync(string email)

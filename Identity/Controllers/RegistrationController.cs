@@ -1,5 +1,6 @@
 ﻿using Identity.DTOs;
 using Identity.Filters;
+using Identity.Messaging;
 using Identity.Models;
 using Identity.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,11 @@ namespace Identity.Controllers
     public class RegistrationController : ControllerBase
     {
         private readonly IUserService _userService;
-        public RegistrationController(IUserService userService)
+        private readonly IKafkaProducerService _kafkaProducerService;
+        public RegistrationController(IUserService userService, IKafkaProducerService kafkaProducerService)
         {
             _userService = userService;
+            _kafkaProducerService = kafkaProducerService;
         }
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp([FromBody] SignUpDTO user)
@@ -42,6 +45,7 @@ namespace Identity.Controllers
             var _user = _userService.ConvertToUser(user);
             _user.PasswordHash = _userService.HashPassword(user.PasswordHash);
             await _userService.CreateUserAsync(_user);
+            await _kafkaProducerService.SendMessageAsync("user-created", _user.Id);
             return Ok("Пользователь успешно зарегистрирован!");
         }
     }

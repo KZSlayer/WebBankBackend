@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Identity.Repositories.Exceptions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Identity.Filters
@@ -20,6 +21,7 @@ namespace Identity.Filters
                 InvalidOperationException => (409, "Конфликт. Запрос невозможно обработать."),
                 KeyNotFoundException => (404, "Ресурс не найден."),
                 UnauthorizedAccessException => (401, "Доступ запрещён."),
+                UserSaveFailedException => (500, "Ошибка сохранения пользователя. Попробуйте позже."),
                 _ => (500, "Произошла внутренняя ошибка сервера.")
             };
             var response = new

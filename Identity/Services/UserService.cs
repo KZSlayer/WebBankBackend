@@ -1,6 +1,8 @@
 ﻿using Identity.DTOs;
 using Identity.Models;
 using Identity.Repositories;
+using Identity.Repositories.Exceptions;
+using Identity.Services.Exceptions;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Services
@@ -36,9 +38,10 @@ namespace Identity.Services
                 await _repository.AddUserAsync(user);
                 await _transation.CommitAsync();
             }
-            catch (Exception)
+            catch (UserSaveFailedException)
             {
                 await _transation.RollbackAsync();
+                throw new UserCreateFailedException("Не удалось сохранить пользователя в базе данных.");
             }
         }
 

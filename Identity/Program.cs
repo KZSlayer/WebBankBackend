@@ -1,5 +1,7 @@
+using Confluent.Kafka;
 using Identity.Data;
 using Identity.Filters;
+using Identity.Messaging;
 using Identity.Repositories;
 using Identity.Security;
 using Identity.Services;
@@ -32,7 +34,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
         };
     });
-
+var kafkaConfig = builder.Configuration.GetSection("Kafka");
+builder.Services.AddSingleton<IProducer<string, int>>(sp =>
+{
+    var config = new ProducerConfig
+    {
+        BootstrapServers = kafkaConfig["BootstrapServers"],
+    };
+    return new ProducerBuilder<string, int>(config).Build();
+});
+builder.Services.AddScoped<IKafkaProducerService, KafkaProducerService>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
