@@ -1,6 +1,6 @@
 ﻿namespace Transaction.Services
 {
-    public interface TransactionsService
+    public interface ITransactionsService
     {
     }
 }
