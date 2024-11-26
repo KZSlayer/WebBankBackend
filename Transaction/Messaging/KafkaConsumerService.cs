@@ -25,22 +25,25 @@ namespace Transaction.Messaging
 
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
         {
-            _consumer.Subscribe("user-created");
+            await Task.Run(() =>
+            {
+                _consumer.Subscribe("user-created");
 
-            try
-            {
-                while (!cancellationToken.IsCancellationRequested)
+                try
                 {
-                    var result = _consumer.Consume(cancellationToken);
-                    Console.WriteLine($"Получено сообщение: {result.Message.Value}");
-                    Console.WriteLine($"Value: {result.Message.Value}");
-                    await CreateAccountAsync(result.Message.Value, cancellationToken);
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        var result = _consumer.Consume(cancellationToken);
+                        Console.WriteLine($"Получено сообщение: {result.Message.Value}");
+                        Console.WriteLine($"Value: {result.Message.Value}");
+                        CreateAccountAsync(result.Message.Value, cancellationToken).Wait(cancellationToken);
+                    }
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                Console.WriteLine("Потребление сообщений остановлено.");
-            }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine("Потребление сообщений остановлено.");
+                }
+            }, cancellationToken);
         }
 
         public async Task CreateAccountAsync(int message, CancellationToken cancellationToken)
