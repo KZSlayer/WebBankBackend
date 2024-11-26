@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Transaction.DTOs
 {
-    public class DepositDTO
+    public class WithdrawDTO
     {
         [Required]
         public int UserId { get; set; }

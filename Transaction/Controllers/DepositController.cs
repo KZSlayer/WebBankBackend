@@ -34,7 +34,6 @@ namespace Transaction.Controllers
             {
                 return BadRequest("Данные не сохранились");
             }
-            
         }
     }
 }
