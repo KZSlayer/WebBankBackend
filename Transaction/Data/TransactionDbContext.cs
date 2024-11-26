@@ -36,15 +36,15 @@ namespace Transaction.Data
                 }
             );
             modelBuilder.Entity<Transactions>()
-               .HasOne(t => t.FromAccount)
+               .HasOne(t => t.FromAccountUser)
                .WithMany(a => a.SentTransactions)
-               .HasForeignKey(t => t.FromAccountId)
+               .HasForeignKey(t => t.FromAccountUserId)
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Transactions>()
-                .HasOne(t => t.ToAccount)
+                .HasOne(t => t.ToAccountUser)
                 .WithMany(a => a.ReceivedTransactions)
-                .HasForeignKey(t => t.ToAccountId)
+                .HasForeignKey(t => t.ToAccountUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Transactions>()

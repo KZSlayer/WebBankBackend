@@ -19,9 +19,27 @@ namespace Transaction.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task<Account> FindByIdAsync(int userID)
+        {
+            return await _dbContext.accounts.FirstOrDefaultAsync(ac => ac.UserId == userID);
+        }
+
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _dbContext.Database.BeginTransactionAsync();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw new DbUpdateException("Данные не сохранились");
+            }
+            
         }
     }
 }

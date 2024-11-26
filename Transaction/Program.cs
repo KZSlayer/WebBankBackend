@@ -10,10 +10,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<TransactionDbContext>();
-builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
-builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
+//builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
+//builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITransactionsRepository, TransactionsRepository>();
+builder.Services.AddScoped<ITransactionsService, TransactionsService>();
+builder.Services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
+builder.Services.AddScoped<ITransactionTypeService, TransactionTypeService>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
