@@ -17,4 +17,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="DTOs\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Messaging\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>

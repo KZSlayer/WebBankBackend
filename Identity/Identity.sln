@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity", "Identity.csproj", "{C496F0B8-344F-4EC0-A90B-D689EB469232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transaction", "..\Transaction\Transaction.csproj", "{B91BD6F3-4F45-4415-8A38-07BA9DD08769}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transaction", "..\Transaction\Transaction.csproj", "{B91BD6F3-4F45-4415-8A38-07BA9DD08769}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Payments", "..\Payments\Payments.csproj", "{92B7989E-EB95-4635-9FA1-7A174DDFBAF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B91BD6F3-4F45-4415-8A38-07BA9DD08769}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B91BD6F3-4F45-4415-8A38-07BA9DD08769}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B91BD6F3-4F45-4415-8A38-07BA9DD08769}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92B7989E-EB95-4635-9FA1-7A174DDFBAF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92B7989E-EB95-4635-9FA1-7A174DDFBAF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92B7989E-EB95-4635-9FA1-7A174DDFBAF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92B7989E-EB95-4635-9FA1-7A174DDFBAF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

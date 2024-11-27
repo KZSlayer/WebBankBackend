@@ -9,7 +9,7 @@ namespace Payments.Data
     {
         public DbSet<PaymentTransaction> payment_transactions { get; set; }
         public DbSet<PaymentProvider> payment_providers { get; set; }
-        public DbSet<ServiceProvider> service_categories { get; set; }
+        public DbSet<ServiceCategory> service_categories { get; set; }
         public DbSet<PhoneNumberRange> phone_number_ranges { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
