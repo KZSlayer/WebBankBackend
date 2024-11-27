@@ -17,8 +17,58 @@ namespace Payments.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<PaymentProvider>().HasData(
+                new PaymentProvider
+                {
+                    Id = 1,
+                    Name = "Билайн",
+                    Description = "Оператор мобильной связи"
+                },
+                new PaymentProvider
+                {
+                    Id = 2,
+                    Name = "Мегафон",
+                    Description = "Оператор мобильной связи"
+                },
+                new PaymentProvider
+                {
+                    Id = 3,
+                    Name = "МТС",
+                    Description = "Оператор мобильной связи"
+                });
+            modelBuilder.Entity<PhoneNumberRange>().HasData(
+                new PhoneNumberRange
+                {
+                    Id = 1,
+                    PaymentProviderId = 1,
+                    Prefix = "963",
+                    StartRange = 6470000,
+                    EndRange = 6999999,
+                },
+                new PhoneNumberRange
+                {
+                    Id = 2,
+                    PaymentProviderId = 1,
+                    Prefix = "906",
+                    StartRange = 7000000,
+                    EndRange = 7999999,
+                },
+                new PhoneNumberRange
+                {
+                    Id = 3,
+                    PaymentProviderId = 2,
+                    Prefix = "936",
+                    StartRange = 5000000,
+                    EndRange = 5399999,
+                },
+                new PhoneNumberRange
+                {
+                    Id = 4,
+                    PaymentProviderId = 3,
+                    Prefix = "916",
+                    StartRange = 0,
+                    EndRange = 9999999,
+                });
             modelBuilder.Entity<PaymentTransaction>().ToTable("payment_transactions");
             modelBuilder.Entity<PaymentProvider>().ToTable("payment_providers");
             modelBuilder.Entity<ServiceCategory>().ToTable("service_categories");
