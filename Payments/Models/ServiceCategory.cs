@@ -16,11 +16,7 @@ namespace Payments.Models
         [MaxLength(255)]
         public string Description { get; set; }
 
-        [Required]
-        [ForeignKey("PaymentProvider")]
-        public int PaymentProviderId { get; set; }
-
-        public PaymentProvider PaymentProvider { get; set; }
+        public ICollection<PaymentProvider> PaymentProviders { get; set; }
         public ICollection<PaymentTransaction> PaymentTransactions { get; set; }
     }
 }

@@ -1,8 +1,27 @@
 using Payments.Data;
+using Payments.Repositories;
+using Payments.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PaymentsDbContext>();
+builder.Services.AddScoped<IPhoneNumberRangesRepository, PhoneNumberRangesRepository>();
+builder.Services.AddScoped<IPhoneNumberRangesService, PhoneNumberRangesService>();
+builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
+builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
 var app = builder.Build();
-app.MapGet("/", () => "Hello World!");
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.UseAuthentication();
+app.MapControllers();
 
 app.Run();

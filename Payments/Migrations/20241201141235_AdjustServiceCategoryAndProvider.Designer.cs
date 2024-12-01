@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Payments.Data;
@@ -11,9 +12,11 @@ using Payments.Data;
 namespace Payments.Migrations
 {
     [DbContext(typeof(PaymentsDbContext))]
-    partial class PaymentsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241201141235_AdjustServiceCategoryAndProvider")]
+    partial class AdjustServiceCategoryAndProvider
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,10 +147,10 @@ namespace Payments.Migrations
                         new
                         {
                             Id = 1,
-                            EndRange = 9636999999L,
+                            EndRange = 9366999999L,
                             PaymentProviderId = 1,
                             Prefix = "963",
-                            StartRange = 9636470000L
+                            StartRange = 9366470000L
                         },
                         new
                         {

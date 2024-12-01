@@ -22,19 +22,22 @@ namespace Payments.Data
                 {
                     Id = 1,
                     Name = "Билайн",
-                    Description = "Оператор мобильной связи"
+                    Description = "Оператор мобильной связи",
+                    ServiceCategoryId = 1,
                 },
                 new PaymentProvider
                 {
                     Id = 2,
                     Name = "Мегафон",
-                    Description = "Оператор мобильной связи"
+                    Description = "Оператор мобильной связи",
+                    ServiceCategoryId = 1,
                 },
                 new PaymentProvider
                 {
                     Id = 3,
                     Name = "МТС",
-                    Description = "Оператор мобильной связи"
+                    Description = "Оператор мобильной связи",
+                    ServiceCategoryId = 1,
                 });
             modelBuilder.Entity<PhoneNumberRange>().HasData(
                 new PhoneNumberRange
@@ -42,32 +45,39 @@ namespace Payments.Data
                     Id = 1,
                     PaymentProviderId = 1,
                     Prefix = "963",
-                    StartRange = 6470000,
-                    EndRange = 6999999,
+                    StartRange = 9636470000,
+                    EndRange = 9636999999,
                 },
                 new PhoneNumberRange
                 {
                     Id = 2,
                     PaymentProviderId = 1,
                     Prefix = "906",
-                    StartRange = 7000000,
-                    EndRange = 7999999,
+                    StartRange = 9067000000,
+                    EndRange = 9067999999,
                 },
                 new PhoneNumberRange
                 {
                     Id = 3,
                     PaymentProviderId = 2,
                     Prefix = "936",
-                    StartRange = 5000000,
-                    EndRange = 5399999,
+                    StartRange = 9365000000,
+                    EndRange = 9365399999,
                 },
                 new PhoneNumberRange
                 {
                     Id = 4,
                     PaymentProviderId = 3,
                     Prefix = "916",
-                    StartRange = 0,
-                    EndRange = 9999999,
+                    StartRange = 9160,
+                    EndRange = 9169999999,
+                });
+            modelBuilder.Entity<ServiceCategory>().HasData(
+                new ServiceCategory
+                {
+                    Id = 1,
+                    Name = "Мобильная связь",
+                    Description = "Оплата мобильной связи",
                 });
             modelBuilder.Entity<PaymentTransaction>().ToTable("payment_transactions");
             modelBuilder.Entity<PaymentProvider>().ToTable("payment_providers");
@@ -102,9 +112,9 @@ namespace Payments.Data
                       .IsRequired();
                 entity.Property(e => e.Description)
                       .HasMaxLength(255);
-                entity.HasMany(e => e.ServiceCategories)
-                      .WithOne(sc => sc.PaymentProvider)
-                      .HasForeignKey(sc => sc.PaymentProviderId)
+                entity.HasOne(e => e.ServiceCategory)
+                      .WithMany(sc => sc.PaymentProviders)
+                      .HasForeignKey(sc => sc.ServiceCategoryId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -116,10 +126,6 @@ namespace Payments.Data
                       .IsRequired();
                 entity.Property(e => e.Description)
                       .HasMaxLength(255);
-                entity.HasOne(e => e.PaymentProvider)
-                      .WithMany(p => p.ServiceCategories)
-                      .HasForeignKey(e => e.PaymentProviderId)
-                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<PhoneNumberRange>(entity =>

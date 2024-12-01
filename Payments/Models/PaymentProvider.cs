@@ -16,6 +16,9 @@ namespace Payments.Models
         [MaxLength(255)]
         public string Description { get; set; }
 
-        public ICollection<ServiceCategory> ServiceCategories { get; set; }
+        [ForeignKey("ServiceCategory")]
+        public int ServiceCategoryId { get; set; }
+
+        public ServiceCategory ServiceCategory { get; set; }
     }
 }
