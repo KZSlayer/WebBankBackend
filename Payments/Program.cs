@@ -11,6 +11,8 @@ builder.Services.AddScoped<IPhoneNumberRangesRepository, PhoneNumberRangesReposi
 builder.Services.AddScoped<IPhoneNumberRangesService, PhoneNumberRangesService>();
 builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
+builder.Services.AddScoped<IPaymentProviderRepository, PaymentProviderRepository>();
+builder.Services.AddScoped<IPaymentProviderService, PaymentProviderService>();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 var app = builder.Build();

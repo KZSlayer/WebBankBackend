@@ -19,6 +19,7 @@ namespace Payments.Services
             {
                 throw new Exception();
             }
+            Console.WriteLine($"ProviderID: {providerID}");
             return providerID;
         }
     }

@@ -8,9 +8,13 @@ namespace Payments.Controllers
     public class PayPhoneController : ControllerBase
     {
         private readonly IPhoneNumberRangesService _phoneNumberRangesService;
-        public PayPhoneController(IPhoneNumberRangesService phoneNumberRangesService)
+        private readonly IPaymentProviderService _paymentProviderService;
+        private readonly IPaymentTransactionService _paymentTransactionService;
+        public PayPhoneController(IPhoneNumberRangesService phoneNumberRangesService, IPaymentTransactionService paymentTransactionService, IPaymentProviderService paymentProviderService)
         {
             _phoneNumberRangesService = phoneNumberRangesService;
+            _paymentTransactionService = paymentTransactionService;
+            _paymentProviderService = paymentProviderService;
         }
 
         [HttpPost("PayPhone")]
@@ -19,6 +23,8 @@ namespace Payments.Controllers
             try
             {
                 var providerID = await _phoneNumberRangesService.FindPaymentProviderIdAsync(phoneNumber);
+                var categoryID = await _paymentProviderService.FindServiceCategoryIdAsync(providerID.Value);
+                //await _paymentTransactionService.CreatePaymentTransactionAsync(0, categoryID.Value, 100);
                 return Ok();
             }
             catch (Exception)
