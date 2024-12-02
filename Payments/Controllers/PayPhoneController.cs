@@ -18,13 +18,13 @@ namespace Payments.Controllers
         }
 
         [HttpPost("PayPhone")]
-        public async Task<IActionResult> PayPhone(string phoneNumber)
+        public async Task<IActionResult> PayPhone(int userID, string phoneNumber, decimal amount)
         {
             try
             {
                 var providerID = await _phoneNumberRangesService.FindPaymentProviderIdAsync(phoneNumber);
                 var categoryID = await _paymentProviderService.FindServiceCategoryIdAsync(providerID.Value);
-                //await _paymentTransactionService.CreatePaymentTransactionAsync(0, categoryID.Value, 100);
+                await _paymentTransactionService.CreatePaymentTransactionAsync(userID, categoryID.Value, amount);
                 return Ok();
             }
             catch (Exception)

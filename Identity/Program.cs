@@ -35,13 +35,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 var kafkaConfig = builder.Configuration.GetSection("Kafka");
-builder.Services.AddSingleton<IProducer<string, int>>(sp =>
+builder.Services.AddSingleton<IProducer<string, string>>(sp =>
 {
     var config = new ProducerConfig
     {
         BootstrapServers = kafkaConfig["BootstrapServers"],
     };
-    return new ProducerBuilder<string, int>(config).Build();
+    return new ProducerBuilder<string, string>(config).Build();
 });
 builder.Services.AddScoped<IKafkaProducerService, KafkaProducerService>();
 var app = builder.Build();

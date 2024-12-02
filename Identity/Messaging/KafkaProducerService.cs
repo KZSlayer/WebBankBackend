@@ -5,19 +5,19 @@ namespace Identity.Messaging
 {
     public class KafkaProducerService : IKafkaProducerService
     {
-        private readonly IProducer<string, int> _producer;
-        public KafkaProducerService(IProducer<string, int> producer)
+        private readonly IProducer<string, string> _producer;
+        public KafkaProducerService(IProducer<string, string> producer)
         {
             _producer = producer;
         }
 
-        public async Task SendMessageAsync(string topic, int userID)
+        public async Task SendMessageAsync(string topic, string userID)
         {
             try
             {
                 var result = await _producer.ProduceAsync(
                     topic, 
-                    new Message<string, int> 
+                    new Message<string, string> 
                     {
                         Key = $"userId-{userID}",
                         Value = userID 

@@ -12,6 +12,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddDbContext<TransactionDbContext>();
 builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
 builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
+builder.Services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionsRepository, TransactionsRepository>();

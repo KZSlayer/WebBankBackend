@@ -17,9 +17,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Messaging\" />
-  </ItemGroup>
-
 </Project>

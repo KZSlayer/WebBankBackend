@@ -45,7 +45,8 @@ namespace Identity.Controllers
             var _user = _userService.ConvertToUser(user);
             _user.PasswordHash = _userService.HashPassword(user.PasswordHash);
             await _userService.CreateUserAsync(_user);
-            await _kafkaProducerService.SendMessageAsync("user-created", _user.Id);
+            Console.WriteLine($"UserIDstring: {_user.Id.ToString()}");
+            await _kafkaProducerService.SendMessageAsync("user-created", _user.Id.ToString());
             return Ok("Пользователь успешно зарегистрирован!");
         }
     }
