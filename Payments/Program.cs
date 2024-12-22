@@ -1,4 +1,5 @@
 using Payments.Data;
+using Payments.Filters;
 using Payments.Messaging;
 using Payments.Repositories;
 using Payments.Services;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IPaymentProviderService, PaymentProviderService>();
 builder.Services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
 builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
 builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
+builder.Services.AddScoped<CustomExceptionFilter>();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 var app = builder.Build();

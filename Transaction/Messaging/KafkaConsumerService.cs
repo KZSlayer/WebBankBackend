@@ -56,7 +56,6 @@ namespace Transaction.Messaging
                                 break;
                             case "payment-transaction-check":
                                 var paymentCheck = JsonSerializer.Deserialize<PaymentCheckDTO>(result.Message.Value);
-                                Console.WriteLine("Deserialize сообщение");
                                 var hasSufficientBalance = await CheckAccountBalanceAsync(paymentCheck, cancellationToken);
                                 Console.WriteLine($"Проверили хватает ли баланса: {hasSufficientBalance}");
                                 var paymentResult = new PaymentResultDTO
@@ -117,7 +116,6 @@ namespace Transaction.Messaging
 
             try
             {
-                Console.WriteLine("Мы в CheckAccountBalanceAsync");
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();

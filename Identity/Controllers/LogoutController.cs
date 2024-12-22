@@ -16,7 +16,7 @@ namespace Identity.Controllers
         }
 
         [HttpPost("FromDevice")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> LogoutFromDevice([FromBody] SignOutDTO signOutDTO)
         {
             await _tokenService.InvalidationTokenAsync(signOutDTO.UserID, signOutDTO.DeviceID);
@@ -24,7 +24,7 @@ namespace Identity.Controllers
         }
 
         [HttpPost("FromAllDevices")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> LogoutFromAllDevices([FromBody] SignOutDTO signOutDTO)
         {
             await _tokenService.InvalidationAllTokensAsync(signOutDTO.UserID);

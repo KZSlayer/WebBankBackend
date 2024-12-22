@@ -7,6 +7,7 @@ namespace Payments.Repositories
     {
         Task AddPaymentTransactionAsync(PaymentTransaction transaction);
         Task EditPaymentTransactionStatusAsync(int transactionID, string status);
+        Task<PaymentTransaction?> GetPaymentTransactionById(int transactionID);
         Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Payments.Data;
+using Payments.Models;
 
 namespace Payments.Repositories
 {
@@ -13,13 +14,11 @@ namespace Payments.Repositories
             _context = context;
         }
 
-        public async Task<int?> GetPaymentProviderIdAsync(string prefix, long number)
+        public async Task<List<PhoneNumberRange>> GetPhoneNumberRangesByPrefixAsync(string prefix)
         {
-            var providerID = await _context.phone_number_ranges
-                .Where(pnr => pnr.Prefix == prefix && number >= pnr.StartRange && number <= pnr.EndRange)
-                .Select(pnr => pnr.PaymentProviderId)
-                .FirstOrDefaultAsync();
-            return providerID;
+            return await _context.phone_number_ranges
+                .Where(pnr => pnr.Prefix == prefix)
+                .ToListAsync();
         }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

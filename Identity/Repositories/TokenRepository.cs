@@ -19,7 +19,7 @@ namespace Identity.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<RefreshToken> GetRefreshTokenAsync(string refreshToken, string deviceID)
+        public async Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken, string deviceID)
         {
             return await _context.refresh_tokens
                 .FirstOrDefaultAsync(rt => rt.Token == refreshToken

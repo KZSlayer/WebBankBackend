@@ -1,6 +1,8 @@
-﻿using Identity.Models;
+﻿using Identity.DTOs;
+using Identity.Models;
 using Identity.Repositories;
 using Identity.Security;
+using Identity.Services.Exceptions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,6 +24,7 @@ namespace Identity.Services
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role)
                 };
 
                 var jwt = new JwtSecurityToken(
@@ -47,6 +50,7 @@ namespace Identity.Services
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role)
                 };
 
                 var jwt = new JwtSecurityToken(
@@ -71,7 +75,28 @@ namespace Identity.Services
             }
             
         }
-
+        public async Task<object> UpdateAccessTokenAsync(RefreshTokenDTO refreshTokenDTO)
+        {
+            if (string.IsNullOrEmpty(refreshTokenDTO.RefreshToken) || string.IsNullOrEmpty(refreshTokenDTO.DeviceID))
+            {
+                throw new ArgumentException();
+            }
+            var userID = await ValidateRefreshTokenAsync(refreshTokenDTO.RefreshToken, refreshTokenDTO.DeviceID);
+            if (userID == null)
+            {
+                throw new InvalidRefreshTokenException();
+            }
+            var user = new User { Id = userID.Value };
+            var newRefreshToken = GenerateRefreshToken(user, refreshTokenDTO.DeviceID);
+            await InvalidationTokenAsync(user.Id, refreshTokenDTO.DeviceID);
+            await SaveRefreshTokenAsync(newRefreshToken);
+            var tokens = new
+            {
+                access_token = GenerateAccessToken(user),
+                refresh_token = newRefreshToken.Token,
+            };
+            return tokens;
+        }
         public async Task<int?> ValidateRefreshTokenAsync(string refreshToken, string deviceID)
         {
             try

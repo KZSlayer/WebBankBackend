@@ -2,6 +2,7 @@
 using Payments.Messaging;
 using Payments.Models;
 using Payments.Repositories;
+using Payments.Services.Exceptions;
 
 namespace Payments.Services
 {
@@ -31,7 +32,6 @@ namespace Payments.Services
             {
                 await _repository.AddPaymentTransactionAsync(paymentTransaction);
                 await _transaction.CommitAsync();
-                Console.WriteLine($"paymentTransaction.Id: {paymentTransaction.Id}");
                 var kafkaMessage = new ProducerKafkaDTO
                 {
                     PaymentTransactionId = paymentTransaction.Id,
@@ -40,21 +40,26 @@ namespace Payments.Services
                 };
                 await _producerService.SendMessageAsync("payment-transaction-check", kafkaMessage);
             }
-            catch (Exception)
+            catch (PaymentTransactionAddException)
             {
                 await _transaction.RollbackAsync();
-                throw new Exception();
+                throw;
             }
         }
         public async Task UpdatePaymentTransactionStatusAsync(int transactionID, string status)
         {
+            var current_pt = await _repository.GetPaymentTransactionById(transactionID);
+            if (current_pt == null)
+            {
+                throw new PaymentTransactionNotFoundException();
+            }
             var transaction = await _repository.BeginTransactionAsync();
             try
             {
                 await _repository.EditPaymentTransactionStatusAsync(transactionID, status);
                 await transaction.CommitAsync();
             }
-            catch (Exception)
+            catch (PaymentTransactionUpdateException)
             {
                 await transaction.RollbackAsync();
                 throw;

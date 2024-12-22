@@ -6,9 +6,13 @@ namespace Identity.Messaging
     public class KafkaProducerService : IKafkaProducerService
     {
         private readonly IProducer<string, string> _producer;
-        public KafkaProducerService(IProducer<string, string> producer)
+        public KafkaProducerService(IConfiguration configuration)
         {
-            _producer = producer;
+            var config = new ProducerConfig
+            {
+                BootstrapServers = configuration["Kafka:BootstrapServers"]
+            };
+            _producer = new ProducerBuilder<string, string>(config).Build();
         }
 
         public async Task SendMessageAsync(string topic, string userID)

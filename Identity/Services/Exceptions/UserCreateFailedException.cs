@@ -2,6 +2,8 @@
 {
     public class UserCreateFailedException : Exception
     {
-        public UserCreateFailedException(string message) : base(message) { }
+        public UserCreateFailedException()
+            : base("Не удалось сохранить пользователя в базе данных.")
+        { }
     }
 }

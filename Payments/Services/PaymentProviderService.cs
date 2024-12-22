@@ -1,4 +1,5 @@
 ﻿using Payments.Repositories;
+using Payments.Services.Exceptions;
 
 namespace Payments.Services
 {
@@ -14,9 +15,8 @@ namespace Payments.Services
             var categoryId = await _repository.GetServiceCategoryIdAsync(providerID);
             if (categoryId == null)
             {
-                throw new Exception();
+                throw new СategoryNotFoundException();
             }
-            Console.WriteLine($"CategoryID: {categoryId}");
             return categoryId;
         }
     }

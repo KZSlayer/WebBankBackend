@@ -11,7 +11,33 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "¬ведите JWT токен в формате 'Bearer {токен}'"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 builder.Services.AddLogging();
 builder.Services.AddDbContext<IdentityDbContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -34,15 +60,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
         };
     });
-var kafkaConfig = builder.Configuration.GetSection("Kafka");
-builder.Services.AddSingleton<IProducer<string, string>>(sp =>
-{
-    var config = new ProducerConfig
-    {
-        BootstrapServers = kafkaConfig["BootstrapServers"],
-    };
-    return new ProducerBuilder<string, string>(config).Build();
-});
 builder.Services.AddScoped<IKafkaProducerService, KafkaProducerService>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -51,8 +68,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

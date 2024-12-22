@@ -1,9 +1,8 @@
-﻿using Identity.Repositories.Exceptions;
-using Identity.Services.Exceptions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Payments.Services.Exceptions;
 
-namespace Identity.Filters
+namespace Payments.Filters
 {
     public class CustomExceptionFilter : IExceptionFilter
     {
@@ -22,12 +21,11 @@ namespace Identity.Filters
                 InvalidOperationException => (409, "Конфликт. Запрос невозможно обработать."),
                 KeyNotFoundException => (404, "Ресурс не найден."),
                 UnauthorizedAccessException => (401, "Доступ запрещён."),
-                UserSaveFailedException => (500, "Ошибка сохранения пользователя. Попробуйте позже."),
-                UserPhoneAlreadyExist => (409, "Пользователь с таким номером телефона уже существует."),
-                UserEmailAlreadyExist => (409, "Пользователь с такой почтой уже существует."),
-                InvalidPasswordException => (401, "Указан неверный пароль."),
-                UserNotFoundException => (404, "Пользователь с указанным номером телефона не найден."),
-                InvalidRefreshTokenException => (401, "Неверный или истёкший токен."),
+                ProviderNotFoundException => (404, "Провайдер для номера не найден."),
+                СategoryNotFoundException => (404, "Категория не найдена."),
+                PaymentTransactionNotFoundException => (404, "Транзакция не найдена."),
+                PaymentTransactionUpdateException => (404, "Транзакция не найдена."),
+                PaymentTransactionAddException => (500, "Ошибка добавления транзакции."),
                 _ => (500, "Произошла внутренняя ошибка сервера.")
             };
             var response = new

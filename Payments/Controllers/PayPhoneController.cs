@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Payments.Filters;
 using Payments.Services;
 
 namespace Payments.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ServiceFilter(typeof(CustomExceptionFilter))]
     public class PayPhoneController : ControllerBase
     {
         private readonly IPhoneNumberRangesService _phoneNumberRangesService;
@@ -20,17 +22,10 @@ namespace Payments.Controllers
         [HttpPost("PayPhone")]
         public async Task<IActionResult> PayPhone(int userID, string phoneNumber, decimal amount)
         {
-            try
-            {
-                var providerID = await _phoneNumberRangesService.FindPaymentProviderIdAsync(phoneNumber);
-                var categoryID = await _paymentProviderService.FindServiceCategoryIdAsync(providerID.Value);
-                await _paymentTransactionService.CreatePaymentTransactionAsync(userID, categoryID.Value, amount);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return BadRequest("Ошибка");
-            }
+            var providerID = await _phoneNumberRangesService.FindPaymentProviderIdAsync(phoneNumber);
+            var categoryID = await _paymentProviderService.FindServiceCategoryIdAsync(providerID.Value);
+            await _paymentTransactionService.CreatePaymentTransactionAsync(userID, categoryID.Value, amount);
+            return Ok();
         }
     }
 }

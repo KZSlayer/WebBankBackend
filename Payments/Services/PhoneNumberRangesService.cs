@@ -1,5 +1,5 @@
-﻿
-using Payments.Repositories;
+﻿using Payments.Repositories;
+using Payments.Services.Exceptions;
 
 namespace Payments.Services
 {
@@ -12,15 +12,19 @@ namespace Payments.Services
         }
         public async Task<int?> FindPaymentProviderIdAsync(string phoneNumber)
         {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                throw new ArgumentException();
+            }
             string prefix = phoneNumber.Substring(2,3);
             long number = long.Parse(phoneNumber.Substring(2));
-            var providerID = await _repository.GetPaymentProviderIdAsync(prefix, number);
-            if (providerID == null)
+            var ranges = await _repository.GetPhoneNumberRangesByPrefixAsync(prefix);
+            var matchingRange = ranges.FirstOrDefault(range => number >= range.StartRange && number <= range.EndRange);
+            if (matchingRange == null)
             {
-                throw new Exception();
+                throw new ProviderNotFoundException();
             }
-            Console.WriteLine($"ProviderID: {providerID}");
-            return providerID;
+            return matchingRange.PaymentProviderId;
         }
     }
 }
