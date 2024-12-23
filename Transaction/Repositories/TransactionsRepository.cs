@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Collections.Generic;
 using Transaction.Data;
+using Transaction.DTOs;
 using Transaction.Models;
 
 namespace Transaction.Repositories
@@ -24,24 +26,41 @@ namespace Transaction.Repositories
                 Console.WriteLine($"Ошибка в rep AddTransactionAsync \n{ex.InnerException?.Message}");
                 throw new DbUpdateException();
             }
-            
         }
-        public Task GetAllTransactionsAsync(int userID)
+        public Task<List<TransactionDTO>> SelectAllAccountTransactionsAsync(long accountNumber)
         {
             var transactions = _context.transactions
-                .Where(t => t.FromAccountUserId == userID || t.ToAccountUserId == userID)
-                .Select(t => new
+                .Where(t => t.FromAccountNumber == accountNumber || t.ToAccountNumber == accountNumber)
+                .Include(t => t.TransactionType)
+                .Select(t => new TransactionDTO
                 {
-                    t.Id,
-                    t.Amount,
-                    t.Status,
-                    t.Timestamp,
-                    FromAccount = t.FromAccountUserId,
-                    ToAccount = t.ToAccountUserId,
-                    TransactionType = t.TransactionType.Name
+                    Id = t.Id,
+                    FromAccountNumber = t.FromAccountNumber,
+                    ToAccountNumber = t.ToAccountNumber,
+                    Amount = t.Amount,
+                    TransactionType = t.TransactionType.Name,
+                    Status = t.Status,
+                    Timestamp = t.Timestamp,
                 })
-                .ToList();
-            return Task.FromResult(transactions);
+                .ToListAsync();
+            return transactions;
+        }
+        public Task<List<TransactionDTO>> SelectAllTransactionsAsync()
+        {
+            var transactions = _context.transactions
+                .Include(t => t.TransactionType)
+                .Select(t => new TransactionDTO
+                {
+                    Id = t.Id,
+                    FromAccountNumber = t.FromAccountNumber,
+                    ToAccountNumber = t.ToAccountNumber,
+                    Amount = t.Amount,
+                    TransactionType = t.TransactionType.Name,
+                    Status = t.Status,
+                    Timestamp = t.Timestamp,
+                })
+                .ToListAsync();
+            return transactions;
         }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

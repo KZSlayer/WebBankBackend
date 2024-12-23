@@ -13,14 +13,14 @@ namespace Transaction.Models
         public int UserId { get; set; }
 
         [Required]
+        public long AccountNumber { get; set; }
+        
+        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Balance { get; set; }
 
         [Required]
         [MaxLength(3)]
         public string Currency { get; set; }
-
-        public ICollection<Transactions> SentTransactions { get; set; }
-        public ICollection<Transactions> ReceivedTransactions { get; set; }
     }
 }

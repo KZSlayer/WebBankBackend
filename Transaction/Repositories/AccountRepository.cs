@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Security.Principal;
 using Transaction.Data;
 using Transaction.Models;
 
@@ -18,8 +19,14 @@ namespace Transaction.Repositories
             await _dbContext.accounts.AddAsync(account);
             await _dbContext.SaveChangesAsync();
         }
+        public async Task<List<long>> GetAccountNumbersAsync()
+        {
+            return await _dbContext.accounts
+                .Select(account => account.AccountNumber)
+                .ToListAsync();
+        }
 
-        public async Task<Account> FindByIdAsync(int userID)
+        public async Task<Account> FindByUserIdAsync(int userID)
         {
             return await _dbContext.accounts.FirstOrDefaultAsync(ac => ac.UserId == userID);
         }

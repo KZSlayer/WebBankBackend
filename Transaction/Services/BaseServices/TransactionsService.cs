@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Transaction.DTOs;
 using Transaction.Models;
 using Transaction.Repositories;
 
-namespace Transaction.Services
+namespace Transaction.Services.BaseServices
 {
     public class TransactionsService : ITransactionsService
     {
@@ -11,15 +12,15 @@ namespace Transaction.Services
         {
             _repository = repository;
         }
-        public async Task CreateTransactionAsync(int? fromAccountID, int? toAccountID, decimal amount, int transactionTypeID)
+        public async Task CreateTransactionAsync(long? fromAccountNumber, long? toAccountNumber, decimal amount, int transactionTypeID)
         {
             var _transaction = await _repository.BeginTransactionAsync();
             try
             {
                 var transaction = new Transactions
                 {
-                    FromAccountUserId = fromAccountID,
-                    ToAccountUserId = toAccountID,
+                    FromAccountNumber = fromAccountNumber,
+                    ToAccountNumber = toAccountNumber,
                     Amount = amount,
                     TransactionTypeId = transactionTypeID,
                     Status = "Успешно",
@@ -31,9 +32,19 @@ namespace Transaction.Services
             catch (DbUpdateException ex)
             {
                 await _transaction.RollbackAsync();
-                Console.WriteLine($"Ошибка в ser AddTransactionAsync \n{ex.Message}");
-                throw new DbUpdateException();
+                Console.WriteLine($"{ex.Message}");
+                throw;
             }
+        }
+        public async Task<List<TransactionDTO>> GetAccountTransactionsAsync(long accountNumber)
+        {
+            var accountTransactions = await _repository.SelectAllAccountTransactionsAsync(accountNumber);
+            return accountTransactions;
+        }
+        public async Task<List<TransactionDTO>> GetTransactionsAsync()
+        {
+            var transactions = await _repository.SelectAllTransactionsAsync();
+            return transactions;
         }
     }
 }

@@ -6,14 +6,14 @@ namespace Transaction.Messaging
 {
     public class KafkaProducerService : IKafkaProducerService
     {
-        private readonly IProducer<Null, string> _producer;
+        private readonly IProducer<string?, string> _producer;
         public KafkaProducerService(IConfiguration configuration)
         {
             var config = new ProducerConfig
             {
                 BootstrapServers = configuration["Kafka:BootstrapServers"]
             };
-            _producer = new ProducerBuilder<Null, string>(config).Build();
+            _producer = new ProducerBuilder<string?, string>(config).Build();
         }
 
         public async Task SendMessageAsync(string topic, PaymentResultDTO paymentResultDTO)
@@ -21,10 +21,27 @@ namespace Transaction.Messaging
             try
             {
                 var jsonMessage = JsonSerializer.Serialize(paymentResultDTO);
-                Console.WriteLine("Serialize сообщение");
-                await _producer.ProduceAsync(topic, new Message<Null, string> { Value = jsonMessage });
+                await _producer.ProduceAsync(topic, new Message<string?, string> { Value = jsonMessage });
             }
-            catch (ProduceException<Null, string> ex)
+            catch (ProduceException<string?, string> ex)
+            {
+                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+            }
+        }
+        public async Task SendCheckPhoneAsync(string topic, CheckPhoneDTO checkPhoneDTO)
+        {
+            try
+            {
+                var jsonMessage = JsonSerializer.Serialize(checkPhoneDTO);
+                await _producer.ProduceAsync(
+                    topic,
+                    new Message<string?, string>
+                    {
+                        Key = checkPhoneDTO.SenderId.ToString(),
+                        Value = jsonMessage
+                    });
+            }
+            catch (ProduceException<string?, string> ex)
             {
                 Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }

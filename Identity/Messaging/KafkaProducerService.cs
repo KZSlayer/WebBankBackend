@@ -1,5 +1,6 @@
-﻿
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using Identity.DTOs;
+using System.Text.Json;
 
 namespace Identity.Messaging
 {
@@ -26,14 +27,30 @@ namespace Identity.Messaging
                         Key = $"userId-{userID}",
                         Value = userID 
                     });
-                Console.WriteLine($"Отправлено сообщение в {result.TopicPartitionOffset}");
-                Console.WriteLine($"{result.Value}");
             }
             catch (ProduceException<Null, int> ex)
             {
                 Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }
-            
+        }
+        public async Task SendPhoneCheckResponseAsync(string topic, PhoneCheckResultDTO phoneCheckResultDTO)
+        {
+            try
+            {
+                var jsonMessage = JsonSerializer.Serialize(phoneCheckResultDTO);
+                Console.WriteLine(jsonMessage);
+                var result = await _producer.ProduceAsync(
+                    topic,
+                    new Message<string, string>
+                    {
+                        Key = phoneCheckResultDTO.SenderId.ToString(),
+                        Value = jsonMessage
+                    });
+            }
+            catch (ProduceException<Null, int> ex)
+            {
+                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+            }
         }
     }
 }

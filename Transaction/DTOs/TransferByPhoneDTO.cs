@@ -3,13 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Transaction.DTOs
 {
-    public class TransferDTO
+    public class TransferByPhoneDTO
     {
         [Required]
-        public int FromAccountUserId { get; set; }
-
-        [Required]
-        public int ToAccountUserId { get; set; }
+        [StringLength(12)]
+        public string PhoneNumber { get; set; }
 
         [Required]
         public decimal Amount { get; set; }

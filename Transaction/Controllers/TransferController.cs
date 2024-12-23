@@ -1,42 +1,27 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Transaction.DTOs;
+using Transaction.Filters;
 using Transaction.Services;
 
 namespace Transaction.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ServiceFilter(typeof(CustomExceptionFilter))]
     public class TransferController : ControllerBase
     {
-        private readonly IAccountService _accountService;
-        private readonly ITransactionsService _transactionsService;
-        public TransferController(IAccountService accountService, ITransactionsService transactionsService)
+        private readonly IAccountTransactionService accountTransactionService;
+        public TransferController(IAccountTransactionService _accountTransactionService)
         {
-            _accountService = accountService;
-            _transactionsService = transactionsService;
+            accountTransactionService = _accountTransactionService;
         }
-        [HttpPost("TransferById")]
-        public async Task<IActionResult> TransferById([FromBody] TransferDTO transferDTO)
+        [HttpPost("TransferByPhone")]
+        [Authorize]
+        public async Task<IActionResult> TransferByPhone([FromBody] TransferByPhoneDTO transferDTO)
         {
-            try
-            {
-                await _accountService.FindByIdAsync(transferDTO.FromAccountUserId);
-                await _accountService.FindByIdAsync(transferDTO.ToAccountUserId);
-                await _accountService.DecreaseBalanceAsync(transferDTO.FromAccountUserId, transferDTO.Amount);
-                await _accountService.IncreaseBalanceAsync(transferDTO.ToAccountUserId, transferDTO.Amount);
-                await _transactionsService.CreateTransactionAsync(transferDTO.FromAccountUserId, transferDTO.ToAccountUserId, transferDTO.Amount, 1);
-                return Ok();
-            }
-            catch (InvalidDataException)
-            {
-                return NotFound("Аккаунт не найден");
-            }
-            catch (DbUpdateException)
-            {
-                return BadRequest("Данные не сохранились");
-            }
+            await accountTransactionService.TransferByPhone(transferDTO);
+            return Ok();
         }
     }
 }

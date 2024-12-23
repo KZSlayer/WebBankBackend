@@ -1,8 +1,9 @@
 ﻿using Confluent.Kafka;
+using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using Transaction.DTOs;
 using Transaction.Models;
-using Transaction.Services;
+using Transaction.Services.BaseServices;
 
 namespace Transaction.Messaging
 {
@@ -11,7 +12,8 @@ namespace Transaction.Messaging
         private readonly IConsumer<string?, string> _consumer;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IKafkaProducerService _producer;
-        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer)
+        private readonly PendingRequestsStore _pendingRequestsStore;
+        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer, PendingRequestsStore pendingRequestsStore)
         {
             var config = new ConsumerConfig
             {
@@ -24,6 +26,7 @@ namespace Transaction.Messaging
             _consumer = new ConsumerBuilder<string?, string>(config).Build();
             _serviceScopeFactory = serviceScopeFactory;
             _producer = producer;
+            _pendingRequestsStore = pendingRequestsStore;
         }
 
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
@@ -33,7 +36,8 @@ namespace Transaction.Messaging
                 var topics = new List<string>
                 {
                     "user-created",
-                    "payment-transaction-check"
+                    "payment-transaction-check",
+                    "phone-response"
                 };
                 _consumer.Subscribe(topics);
                 try
@@ -67,6 +71,20 @@ namespace Transaction.Messaging
                                 await _producer.SendMessageAsync("payment-transaction-result", paymentResult);
                                 Console.WriteLine($"Отправили сообщение");
                                 break;
+                            case "phone-response":
+                                var phoneResponse = JsonSerializer.Deserialize<CheckPhoneResultDTO>(result.Message.Value);
+
+                                if (_pendingRequestsStore.TryRemove(phoneResponse.CorrelationId, out var tcs))
+                                {
+                                    tcs.SetResult(phoneResponse?.RecipientId);
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Получен ответ с неизвестным CorrelationId: {phoneResponse.CorrelationId}");
+                                    continue;
+                                }
+                                _consumer.Commit(result);
+                                break;
                             default:
                                 Console.WriteLine($"Неизвестный топик: {result.Topic}");
                                 break;
@@ -89,15 +107,16 @@ namespace Transaction.Messaging
 
             try
             {
-                var account = new Account
-                {
-                    UserId = userID,
-                    Balance = 0,
-                    Currency = "RUB",
-                };
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
+                    var account = new Account
+                    {
+                        UserId = userID,
+                        AccountNumber = await accountService.GenerateAccountNumber(),
+                        Balance = 0,
+                        Currency = "RUB",
+                    };
                     await accountService.CreateAccountAsync(account);
                 }
                 _consumer.Commit();
@@ -119,7 +138,8 @@ namespace Transaction.Messaging
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
-                    await accountService.DecreaseBalanceAsync(paymentCheckDTO.UserId, paymentCheckDTO.Amount);
+                    var account = await accountService.FindByUserIdAsync(paymentCheckDTO.UserId);
+                    await accountService.DecreaseBalanceAsync(account, paymentCheckDTO.Amount); // Переделать?
                 }
                 _consumer.Commit();
                 return true;

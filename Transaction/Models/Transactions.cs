@@ -9,11 +9,11 @@ namespace Transaction.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("FromAccountUser")]
-        public int? FromAccountUserId { get; set; }
+        [ForeignKey("FromAccount")]
+        public long? FromAccountNumber { get; set; }
 
-        [ForeignKey("ToAccountUser")]
-        public int? ToAccountUserId { get; set; }
+        [ForeignKey("ToAccount")]
+        public long? ToAccountNumber { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -28,9 +28,6 @@ namespace Transaction.Models
         public string Status { get; set; }
 
         public DateTime Timestamp { get; set; }
-
-        public Account FromAccountUser { get; set; }
-        public Account ToAccountUser { get; set; }
         public TransactionType TransactionType { get; set; }
     }
 }

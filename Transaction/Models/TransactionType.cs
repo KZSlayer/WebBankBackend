@@ -15,7 +15,5 @@ namespace Transaction.Models
 
         [MaxLength(255)]
         public string Description { get; set; }
-
-        public ICollection<Transactions> Transactions { get; set; }
     }
 }

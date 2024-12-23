@@ -30,6 +30,9 @@ namespace Transaction.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<long>("AccountNumber")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("Balance")
                         .HasColumnType("decimal(18,2)");
 
@@ -100,8 +103,8 @@ namespace Transaction.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("FromAccountUserId")
-                        .HasColumnType("integer");
+                    b.Property<long?>("FromAccountNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -111,17 +114,17 @@ namespace Transaction.Migrations
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("ToAccountUserId")
-                        .HasColumnType("integer");
+                    b.Property<long?>("ToAccountNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("TransactionTypeId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromAccountUserId");
+                    b.HasIndex("FromAccountNumber");
 
-                    b.HasIndex("ToAccountUserId");
+                    b.HasIndex("ToAccountNumber");
 
                     b.HasIndex("TransactionTypeId");
 
@@ -130,39 +133,25 @@ namespace Transaction.Migrations
 
             modelBuilder.Entity("Transaction.Models.Transactions", b =>
                 {
-                    b.HasOne("Transaction.Models.Account", "FromAccountUser")
-                        .WithMany("SentTransactions")
-                        .HasForeignKey("FromAccountUserId")
+                    b.HasOne("Transaction.Models.Account", null)
+                        .WithMany()
+                        .HasForeignKey("FromAccountNumber")
+                        .HasPrincipalKey("AccountNumber")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Transaction.Models.Account", "ToAccountUser")
-                        .WithMany("ReceivedTransactions")
-                        .HasForeignKey("ToAccountUserId")
+                    b.HasOne("Transaction.Models.Account", null)
+                        .WithMany()
+                        .HasForeignKey("ToAccountNumber")
+                        .HasPrincipalKey("AccountNumber")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Transaction.Models.TransactionType", "TransactionType")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("TransactionTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FromAccountUser");
-
-                    b.Navigation("ToAccountUser");
-
                     b.Navigation("TransactionType");
-                });
-
-            modelBuilder.Entity("Transaction.Models.Account", b =>
-                {
-                    b.Navigation("ReceivedTransactions");
-
-                    b.Navigation("SentTransactions");
-                });
-
-            modelBuilder.Entity("Transaction.Models.TransactionType", b =>
-                {
-                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }
