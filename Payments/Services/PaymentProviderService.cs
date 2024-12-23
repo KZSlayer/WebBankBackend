@@ -12,12 +12,19 @@ namespace Payments.Services
         }
         public async Task<int?> FindServiceCategoryIdAsync(int providerID)
         {
-            var categoryId = await _repository.GetServiceCategoryIdAsync(providerID);
-            if (categoryId == null)
+            try
             {
-                throw new СategoryNotFoundException();
+                var categoryId = await _repository.GetServiceCategoryIdAsync(providerID);
+                if (categoryId == null)
+                {
+                    throw new СategoryNotFoundException();
+                }
+                return categoryId;
             }
-            return categoryId;
+            catch (СategoryNotFoundException)
+            {
+                throw;
+            }
         }
     }
 }

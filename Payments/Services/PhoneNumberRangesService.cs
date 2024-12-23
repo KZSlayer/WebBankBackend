@@ -12,19 +12,31 @@ namespace Payments.Services
         }
         public async Task<int?> FindPaymentProviderIdAsync(string phoneNumber)
         {
-            if (string.IsNullOrWhiteSpace(phoneNumber))
+            try
             {
-                throw new ArgumentException();
+                if (string.IsNullOrWhiteSpace(phoneNumber))
+                {
+                    throw new ArgumentException();
+                }
+                string prefix = phoneNumber.Substring(2, 3);
+                long number = long.Parse(phoneNumber.Substring(2));
+                var ranges = await _repository.GetPhoneNumberRangesByPrefixAsync(prefix);
+                var matchingRange = ranges.FirstOrDefault(range => number >= range.StartRange && number <= range.EndRange);
+                if (matchingRange == null)
+                {
+                    throw new ProviderNotFoundException();
+                }
+                return matchingRange.PaymentProviderId;
+
             }
-            string prefix = phoneNumber.Substring(2,3);
-            long number = long.Parse(phoneNumber.Substring(2));
-            var ranges = await _repository.GetPhoneNumberRangesByPrefixAsync(prefix);
-            var matchingRange = ranges.FirstOrDefault(range => number >= range.StartRange && number <= range.EndRange);
-            if (matchingRange == null)
+            catch (ProviderNotFoundException)
             {
-                throw new ProviderNotFoundException();
+                throw;
             }
-            return matchingRange.PaymentProviderId;
+            catch (ArgumentException)
+            {
+                throw;
+            }
         }
     }
 }
