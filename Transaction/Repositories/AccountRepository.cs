@@ -16,8 +16,19 @@ namespace Transaction.Repositories
 
         public async Task AddAccountAsync(Account account)
         {
-            await _dbContext.accounts.AddAsync(account);
-            await _dbContext.SaveChangesAsync();
+            try
+            {
+                await _dbContext.accounts.AddAsync(account);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
         }
         public async Task<List<long>> GetAccountNumbersAsync()
         {
@@ -44,9 +55,12 @@ namespace Transaction.Repositories
             }
             catch (DbUpdateException)
             {
-                throw new DbUpdateException("Данные не сохранились");
+                throw;
             }
-            
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
         }
     }
 }

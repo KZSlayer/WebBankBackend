@@ -35,6 +35,10 @@ namespace Transaction.Services.BaseServices
                 Console.WriteLine($"{ex.Message}");
                 throw;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
         }
         public async Task<List<TransactionDTO>> GetAccountTransactionsAsync(long accountNumber)
         {

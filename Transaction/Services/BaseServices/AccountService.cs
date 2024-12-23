@@ -42,7 +42,6 @@ namespace Transaction.Services.BaseServices
             {
                 throw;
             }
-
         }
         public async Task IncreaseBalanceAsync(Account account, decimal amount)
         {

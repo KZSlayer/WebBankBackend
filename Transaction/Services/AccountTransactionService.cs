@@ -56,6 +56,10 @@ namespace Transaction.Services
             {
                 throw;
             }
+            catch (AccountNotFoundException)
+            {
+                throw;
+            }
         }
         public async Task CashOutAccount(WithdrawDTO withdrawDTO)
         {
@@ -90,29 +94,34 @@ namespace Transaction.Services
             {
                 throw;
             }
+            catch (AccountNotFoundException)
+            {
+                throw;
+            }
         }
+
         public async Task TransferByPhone(TransferByPhoneDTO transferDTO)
         {
-            var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                throw new UserNotAuthenticatedException();
-            }
-            if (transferDTO.Amount <= 0)
-            {
-                throw new InvalidAmountException();
-            }
             var correlationId = Guid.NewGuid().ToString();
             var tcs = new TaskCompletionSource<int?>();
-            _pendingRequestsStore.AddRequest(correlationId, tcs);
-            var query = new CheckPhoneDTO
-            {
-                SenderId = int.Parse(userId),
-                PhoneNumber = transferDTO.PhoneNumber,
-                CorrelationId = correlationId,
-            };
             try
             {
+                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    throw new UserNotAuthenticatedException();
+                }
+                if (transferDTO.Amount <= 0)
+                {
+                    throw new InvalidAmountException();
+                }
+                _pendingRequestsStore.AddRequest(correlationId, tcs);
+                var query = new CheckPhoneDTO
+                {
+                    SenderId = int.Parse(userId),
+                    PhoneNumber = transferDTO.PhoneNumber,
+                    CorrelationId = correlationId,
+                };
                 await _producer.SendCheckPhoneAsync("phone-query", query);
                 var recipientId = await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(15))) == tcs.Task
                     ? await tcs.Task
@@ -139,9 +148,35 @@ namespace Transaction.Services
             {
                 throw;
             }
+            catch (AccountNotFoundException)
+            {
+                throw;
+            }
             finally
             {
                 _pendingRequestsStore.TryRemove(correlationId, out _);
+            }
+        }
+        public async Task<List<TransactionDTO>> GetAccountTransaction()
+        {
+            try
+            {
+                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null)
+                {
+                    throw new UserNotAuthenticatedException();
+                }
+                var user = await _accountService.FindByUserIdAsync(int.Parse(userId)); // Проверка на Parse
+                var transactions = await _transactionsService.GetAccountTransactionsAsync(user.AccountNumber);
+                return transactions;
+            }
+            catch (UserNotAuthenticatedException)
+            {
+                throw;
+            }
+            catch (AccountNotFoundException)
+            {
+                throw;
             }
         }
     }

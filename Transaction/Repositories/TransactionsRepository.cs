@@ -24,7 +24,11 @@ namespace Transaction.Repositories
             catch (DbUpdateException ex)
             {
                 Console.WriteLine($"Ошибка в rep AddTransactionAsync \n{ex.InnerException?.Message}");
-                throw new DbUpdateException();
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
         }
         public Task<List<TransactionDTO>> SelectAllAccountTransactionsAsync(long accountNumber)

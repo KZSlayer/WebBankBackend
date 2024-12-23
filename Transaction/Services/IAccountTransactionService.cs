@@ -7,5 +7,6 @@ namespace Transaction.Services
         Task TopUpAccount(DepositDTO depositDTO);
         Task CashOutAccount(WithdrawDTO withdrawDTO);
         Task TransferByPhone(TransferByPhoneDTO transferDTO);
+        Task<List<TransactionDTO>> GetAccountTransaction();
     }
 }
