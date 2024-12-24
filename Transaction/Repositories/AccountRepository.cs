@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Diagnostics;
 using System.Security.Principal;
 using Transaction.Data;
 using Transaction.Models;
@@ -9,9 +10,11 @@ namespace Transaction.Repositories
     public class AccountRepository : IAccountRepository
     {
         private readonly TransactionDbContext _dbContext;
-        public AccountRepository(TransactionDbContext dbContext)
+        private readonly ILogger<AccountRepository> _logger;
+        public AccountRepository(TransactionDbContext dbContext, ILogger<AccountRepository> logger)
         {
             _dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task AddAccountAsync(Account account)
@@ -21,12 +24,14 @@ namespace Transaction.Repositories
                 await _dbContext.accounts.AddAsync(account);
                 await _dbContext.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при добавлении аккаунта в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при добавлении аккаунта в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -37,7 +42,7 @@ namespace Transaction.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Account> FindByUserIdAsync(int userID)
+        public async Task<Account?> FindByUserIdAsync(int userID)
         {
             return await _dbContext.accounts.FirstOrDefaultAsync(ac => ac.UserId == userID);
         }
@@ -53,12 +58,14 @@ namespace Transaction.Repositories
             {
                 await _dbContext.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при сохранении данных аккаунта в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при сохранении данных аккаунта в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

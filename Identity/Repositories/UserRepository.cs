@@ -25,12 +25,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при добавлении пользователя в базу данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при добавлении пользователя в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw new UserSaveFailedException("Не удалось сохранить пользователя в базе данных.");
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при добавлении пользователя в базу данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при добавлении пользователя в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -43,12 +43,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении почты пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении почты пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении почты пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении почты пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -62,12 +62,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении номера телефона пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении номера телефона пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении номера телефона пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении номера телефона пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -81,12 +81,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении пароля пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении пароля пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении пароля пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении пароля пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -100,12 +100,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении паспортных данных пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении паспортных данных пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении паспортных данных пользователя в базе данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при обновлении паспортных данных пользователя в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

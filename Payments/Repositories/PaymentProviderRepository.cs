@@ -23,12 +23,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при сохранении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при сохранении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при сохранении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при сохранении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -41,12 +41,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -59,12 +59,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при удалении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при удалении провайдера! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении провайдера! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

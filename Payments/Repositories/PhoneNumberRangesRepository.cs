@@ -24,12 +24,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при добавлении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при добавлении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -43,12 +43,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -62,12 +62,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при удалении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при удалении диапазона номеров! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении диапазона номеров! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

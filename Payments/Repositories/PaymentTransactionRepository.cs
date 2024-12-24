@@ -25,12 +25,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw new PaymentTransactionAddException("Ошибка при добавлении транзакции в базу данных.");
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw new PaymentTransactionAddException("Операция добавления транзакции была прервана.");
             }
         }
@@ -47,12 +47,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw new PaymentTransactionUpdateException("Ошибка при обновлении статуса транзакции.");
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw new PaymentTransactionUpdateException("Операция обновления статуса транзакции была прервана.");
             }
         }

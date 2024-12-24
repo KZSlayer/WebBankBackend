@@ -7,13 +7,15 @@ namespace Transaction.Messaging
     public class KafkaProducerService : IKafkaProducerService
     {
         private readonly IProducer<string?, string> _producer;
-        public KafkaProducerService(IConfiguration configuration)
+        private readonly ILogger<KafkaProducerService> _logger;
+        public KafkaProducerService(IConfiguration configuration, ILogger<KafkaProducerService> logger)
         {
             var config = new ProducerConfig
             {
                 BootstrapServers = configuration["Kafka:BootstrapServers"]
             };
             _producer = new ProducerBuilder<string?, string>(config).Build();
+            _logger = logger;
         }
 
         public async Task SendMessageAsync(string topic, PaymentResultDTO paymentResultDTO)
@@ -21,11 +23,12 @@ namespace Transaction.Messaging
             try
             {
                 var jsonMessage = JsonSerializer.Serialize(paymentResultDTO);
+                _logger.LogInformation($"Сообщение отправляется в топик: {topic} - содержит следующие данные: {jsonMessage}");
                 await _producer.ProduceAsync(topic, new Message<string?, string> { Value = jsonMessage });
             }
             catch (ProduceException<string?, string> ex)
             {
-                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+                _logger.LogError($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }
         }
         public async Task SendCheckPhoneAsync(string topic, CheckPhoneDTO checkPhoneDTO)
@@ -33,6 +36,7 @@ namespace Transaction.Messaging
             try
             {
                 var jsonMessage = JsonSerializer.Serialize(checkPhoneDTO);
+                _logger.LogInformation($"Сообщение отправляется в топик: {topic} - содержит следующие данные: {jsonMessage}");
                 await _producer.ProduceAsync(
                     topic,
                     new Message<string?, string>
@@ -43,7 +47,7 @@ namespace Transaction.Messaging
             }
             catch (ProduceException<string?, string> ex)
             {
-                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+                _logger.LogError($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }
         }
     }

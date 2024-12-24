@@ -24,12 +24,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при добавлении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при добавлении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при добавлении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -42,12 +42,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при обновлении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при обновлении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при обновлении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -60,12 +60,12 @@ namespace Payments.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при удалении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при удалении категории! Детали: {ex}");
+                _logger.LogError($"Ошибка при удалении категории! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

@@ -10,9 +10,11 @@ namespace Transaction.Repositories
     public class TransactionsRepository : ITransactionsRepository
     {
         private readonly TransactionDbContext _context;
-        public TransactionsRepository(TransactionDbContext context)
+        private readonly ILogger<TransactionsRepository> _logger;
+        public TransactionsRepository(TransactionDbContext context, ILogger<TransactionsRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task AddTransactionAsync(Transactions transaction)
         {
@@ -23,11 +25,12 @@ namespace Transaction.Repositories
             }
             catch (DbUpdateException ex)
             {
-                Console.WriteLine($"Ошибка в rep AddTransactionAsync \n{ex.InnerException?.Message}");
+                _logger.LogError($"Ошибка при добавлении транзакции в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при добавлении транзакции в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

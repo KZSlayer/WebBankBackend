@@ -24,12 +24,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -68,12 +68,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка в базе данных при отзыве токена! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка в базе данных при отзыве токена! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка в базе данных при отзыве токена! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка в базе данных при отзыве токена! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }
@@ -85,12 +85,12 @@ namespace Identity.Repositories
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
             catch (OperationCanceledException ex)
             {
-                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! \nДетали:\n {ex.Message}");
+                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! Основная причина: {ex.InnerException?.Message}. Все детали: {ex}");
                 throw;
             }
         }

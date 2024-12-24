@@ -13,7 +13,8 @@ namespace Transaction.Messaging
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IKafkaProducerService _producer;
         private readonly PendingRequestsStore _pendingRequestsStore;
-        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer, PendingRequestsStore pendingRequestsStore)
+        private readonly ILogger<KafkaConsumerService> _logger;
+        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer, PendingRequestsStore pendingRequestsStore, ILogger<KafkaConsumerService> logger)
         {
             var config = new ConsumerConfig
             {
@@ -27,6 +28,7 @@ namespace Transaction.Messaging
             _serviceScopeFactory = serviceScopeFactory;
             _producer = producer;
             _pendingRequestsStore = pendingRequestsStore;
+            _logger = logger;
         }
 
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
@@ -45,7 +47,7 @@ namespace Transaction.Messaging
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var result = _consumer.Consume(cancellationToken);
-                        Console.WriteLine($"Получено сообщение из топика {result.Topic}: {result.Message.Value}");
+                        _logger.LogInformation($"Получено сообщение из топика: {result.Topic} - содержащее следующие данные: {result.Message.Value}");
                         switch (result.Topic)
                         {
                             case "user-created":
@@ -55,21 +57,18 @@ namespace Transaction.Messaging
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Ошибка: Невозможно преобразовать сообщение в int");
+                                    _logger.LogError("Ошибка: Невозможно преобразовать сообщение в int");
                                 }
                                 break;
                             case "payment-transaction-check":
                                 var paymentCheck = JsonSerializer.Deserialize<PaymentCheckDTO>(result.Message.Value);
                                 var hasSufficientBalance = await CheckAccountBalanceAsync(paymentCheck, cancellationToken);
-                                Console.WriteLine($"Проверили хватает ли баланса: {hasSufficientBalance}");
                                 var paymentResult = new PaymentResultDTO
                                 {
                                     PaymentTransactionId = paymentCheck.PaymentTransactionId,
                                     Success = hasSufficientBalance
                                 };
-                                Console.WriteLine($"PaymentTransactionId: {paymentResult.PaymentTransactionId}");
                                 await _producer.SendMessageAsync("payment-transaction-result", paymentResult);
-                                Console.WriteLine($"Отправили сообщение");
                                 break;
                             case "phone-response":
                                 var phoneResponse = JsonSerializer.Deserialize<CheckPhoneResultDTO>(result.Message.Value);
@@ -80,20 +79,20 @@ namespace Transaction.Messaging
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Получен ответ с неизвестным CorrelationId: {phoneResponse.CorrelationId}");
+                                    _logger.LogWarning($"Получен ответ с неизвестным CorrelationId: {phoneResponse.CorrelationId}");
                                     continue;
                                 }
                                 _consumer.Commit(result);
                                 break;
                             default:
-                                Console.WriteLine($"Неизвестный топик: {result.Topic}");
+                                _logger.LogWarning($"Неизвестный топик: {result.Topic}");
                                 break;
                         }
                     }
                 }
                 catch (OperationCanceledException)
                 {
-                    Console.WriteLine("Потребление сообщений остановлено.");
+                    _logger.LogDebug("Потребление сообщений остановлено.");
                 }
             }, cancellationToken);
         }
@@ -123,7 +122,7 @@ namespace Transaction.Messaging
             }
             catch (Exception)
             {
-                Console.WriteLine("Не получилось создать объект класса Account или ещё какая ошибка тут");
+                _logger.LogError("Ошибка при попытке создать аккаунт!");
             }
         }
         public async Task<bool> CheckAccountBalanceAsync(PaymentCheckDTO paymentCheckDTO, CancellationToken cancellationToken)
@@ -146,7 +145,7 @@ namespace Transaction.Messaging
             }
             catch (Exception)
             {
-                Console.WriteLine("Ошибка CheckAccountBalanceAsync");
+                _logger.LogError("Ошибка при попытке списать деньги со счёта после выполнения платежа");
                 return false;
             }
         }
