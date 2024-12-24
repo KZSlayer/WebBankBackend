@@ -2,6 +2,8 @@
 {
     public class TransactionTypeAlreadyExistException : Exception
     {
-        public TransactionTypeAlreadyExistException() : base("Такой тип транзакции уже существует!") { }
+        public TransactionTypeAlreadyExistException()
+            : base("Такой тип транзакции уже существует!")
+        { }
     }
 }

@@ -3,6 +3,7 @@ using Payments.Filters;
 using Payments.Messaging;
 using Payments.Repositories;
 using Payments.Services;
+using Payments.Services.BaseServices;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -19,6 +20,7 @@ builder.Services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
 builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
 builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
 builder.Services.AddScoped<CustomExceptionFilter>();
+builder.Services.AddScoped<IPayPhoneService, PayPhoneService>();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 var app = builder.Build();

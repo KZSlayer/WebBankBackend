@@ -27,8 +27,8 @@ namespace Transaction.Services
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
+                var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
                     throw new UserNotAuthenticatedException();
                 }
@@ -65,8 +65,8 @@ namespace Transaction.Services
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
+                var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
                     throw new UserNotAuthenticatedException();
                 }
@@ -106,8 +106,8 @@ namespace Transaction.Services
             var tcs = new TaskCompletionSource<int?>();
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
+                var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
                     throw new UserNotAuthenticatedException();
                 }
@@ -161,8 +161,8 @@ namespace Transaction.Services
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
+                var userId = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
                     throw new UserNotAuthenticatedException();
                 }

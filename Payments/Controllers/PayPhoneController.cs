@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Payments.DTOs;
 using Payments.Filters;
 using Payments.Services;
+using Payments.Services.BaseServices;
 
 namespace Payments.Controllers
 {
@@ -9,22 +11,16 @@ namespace Payments.Controllers
     [ServiceFilter(typeof(CustomExceptionFilter))]
     public class PayPhoneController : ControllerBase
     {
-        private readonly IPhoneNumberRangesService _phoneNumberRangesService;
-        private readonly IPaymentProviderService _paymentProviderService;
-        private readonly IPaymentTransactionService _paymentTransactionService;
-        public PayPhoneController(IPhoneNumberRangesService phoneNumberRangesService, IPaymentTransactionService paymentTransactionService, IPaymentProviderService paymentProviderService)
+        private readonly IPayPhoneService _payPhoneService;
+        public PayPhoneController(IPayPhoneService payPhoneService)
         {
-            _phoneNumberRangesService = phoneNumberRangesService;
-            _paymentTransactionService = paymentTransactionService;
-            _paymentProviderService = paymentProviderService;
+            _payPhoneService = payPhoneService;
         }
 
         [HttpPost("PayPhone")]
-        public async Task<IActionResult> PayPhone(int userID, string phoneNumber, decimal amount)
+        public async Task<IActionResult> PayPhone([FromBody] PayPhoneDTO payPhoneDTO)
         {
-            var providerID = await _phoneNumberRangesService.FindPaymentProviderIdAsync(phoneNumber);
-            var categoryID = await _paymentProviderService.FindServiceCategoryIdAsync(providerID.Value);
-            await _paymentTransactionService.CreatePaymentTransactionAsync(userID, categoryID.Value, amount);
+            await _payPhoneService.PayPhoneAsync(payPhoneDTO);
             return Ok();
         }
     }

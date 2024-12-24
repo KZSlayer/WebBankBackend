@@ -26,6 +26,7 @@ namespace Payments.Filters
                 PaymentTransactionNotFoundException => (404, "Транзакция не найдена."),
                 PaymentTransactionUpdateException => (404, "Транзакция не найдена."),
                 PaymentTransactionAddException => (500, "Ошибка добавления транзакции."),
+                UserNotAuthenticatedException => (401, "Ошибка! Пользователь не авторизирован."),
                 _ => (500, "Произошла внутренняя ошибка сервера.")
             };
             var response = new

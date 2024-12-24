@@ -34,12 +34,11 @@ namespace Payments.Repositories
         {
             return await _context.payment_transactions.FirstOrDefaultAsync(pt => pt.Id == transactionID);
         }
-        public async Task EditPaymentTransactionStatusAsync(int transactionID, string status)
+        public async Task UpdatePaymentTransactionAsync(PaymentTransaction transaction)
         {
             try
             {
-                var transaction = await _context.payment_transactions.FirstOrDefaultAsync(pt => pt.Id == transactionID);
-                transaction.Status = status;
+                _context.payment_transactions.Update(transaction);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
@@ -50,7 +49,6 @@ namespace Payments.Repositories
             {
                 throw new PaymentTransactionUpdateException("Операция обновления статуса транзакции была прервана.");
             }
-            
         }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {

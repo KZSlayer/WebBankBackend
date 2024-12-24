@@ -4,7 +4,7 @@ using Payments.Models;
 using Payments.Repositories;
 using Payments.Services.Exceptions;
 
-namespace Payments.Services
+namespace Payments.Services.BaseServices
 {
     public class PaymentTransactionService : IPaymentTransactionService
     {
@@ -48,20 +48,22 @@ namespace Payments.Services
         }
         public async Task UpdatePaymentTransactionStatusAsync(int transactionID, string status)
         {
-            var current_pt = await _repository.GetPaymentTransactionById(transactionID);
-            if (current_pt == null)
-            {
-                throw new PaymentTransactionNotFoundException();
-            }
-            var transaction = await _repository.BeginTransactionAsync();
             try
             {
-                await _repository.EditPaymentTransactionStatusAsync(transactionID, status);
-                await transaction.CommitAsync();
+                var current_pt = await _repository.GetPaymentTransactionById(transactionID);
+                if (current_pt == null)
+                {
+                    throw new PaymentTransactionNotFoundException();
+                }
+                current_pt.Status = status;
+                await _repository.UpdatePaymentTransactionAsync(current_pt);
+            }
+            catch (PaymentTransactionNotFoundException)
+            {
+                throw;
             }
             catch (PaymentTransactionUpdateException)
             {
-                await transaction.RollbackAsync();
                 throw;
             }
         }

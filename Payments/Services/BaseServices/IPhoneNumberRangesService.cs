@@ -1,4 +1,4 @@
-﻿namespace Payments.Services
+﻿namespace Payments.Services.BaseServices
 {
     public interface IPhoneNumberRangesService
     {

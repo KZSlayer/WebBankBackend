@@ -2,7 +2,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Payments.DTOs;
-using Payments.Services;
+using Payments.Services.BaseServices;
 using System.Text.Json;
 
 namespace Payments.Messaging
