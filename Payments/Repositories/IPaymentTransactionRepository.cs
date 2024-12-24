@@ -8,6 +8,8 @@ namespace Payments.Repositories
         Task AddPaymentTransactionAsync(PaymentTransaction transaction);
         Task UpdatePaymentTransactionAsync(PaymentTransaction transaction);
         Task<PaymentTransaction?> GetPaymentTransactionById(int transactionID);
+        Task<List<PaymentTransaction>> SelectAllPaymentTransactionsAsync();
+        Task<List<PaymentTransaction>> SelectAllUserPaymentTransactionsAsync(int userId);
         Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

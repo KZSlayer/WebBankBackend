@@ -1,4 +1,4 @@
-﻿using Payments.DTOs;
+﻿using Payments.DTOs.KafkaDTOs;
 
 namespace Payments.Messaging
 {

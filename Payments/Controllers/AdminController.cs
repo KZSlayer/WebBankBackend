@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Payments.DTOs;
+using Payments.DTOs.PaymentProviderDTOs;
+using Payments.DTOs.PhoneNumberRanges;
+using Payments.DTOs.ServiceCategoryDTOs;
 using Payments.Filters;
 using Payments.Services.BaseServices;
 
@@ -13,10 +15,14 @@ namespace Payments.Controllers
     {
         private readonly IServiceCategoryService _serviceCategoryService;
         private readonly IPaymentProviderService _paymentProviderService;
-        public AdminController(IServiceCategoryService serviceCategoryService, IPaymentProviderService paymentProviderService)
+        private readonly IPhoneNumberRangesService _phoneNumberRangesService;
+        private readonly IPaymentTransactionService _paymentTransactionService;
+        public AdminController(IServiceCategoryService serviceCategoryService, IPaymentProviderService paymentProviderService, IPhoneNumberRangesService phoneNumberRangesService, IPaymentTransactionService paymentTransactionService)
         {
             _serviceCategoryService = serviceCategoryService;
             _paymentProviderService = paymentProviderService;
+            _phoneNumberRangesService = phoneNumberRangesService;
+            _paymentTransactionService = paymentTransactionService;
         }
 
         [HttpPost("AddServiceCategory")]
@@ -107,6 +113,67 @@ namespace Payments.Controllers
         {
             var serviceCategories = await _paymentProviderService.GetAllPaymentProviderAsync();
             return Ok(serviceCategories);
+        }
+
+        [HttpPost("AddPhoneNumberRanges")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddPhoneNumberRanges([FromBody] PhoneNumberRangeDTO phoneNumberRangeDTO)
+        {
+            var paymentProvider = await _paymentProviderService.FindPaymentProviderByNameAsync(phoneNumberRangeDTO.PaymentProviderName);
+            await _phoneNumberRangesService.CreatePhoneNumberRangesAsync(phoneNumberRangeDTO, paymentProvider.Id);
+            return Ok();
+        }
+
+        [HttpPatch("ChangePhoneNumberRangesPrefix")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ChangePhoneNumberRangesPrefix([FromBody] EditPhoneNumberRangesPrefixDTO editPhoneNumberRangesPrefixDTO)
+        {
+            var paymentProvider = await _paymentProviderService.FindPaymentProviderByNameAsync(editPhoneNumberRangesPrefixDTO.PaymentProviderName);
+            await _phoneNumberRangesService.EditPhoneNumberRangesPrefixAsync(editPhoneNumberRangesPrefixDTO, paymentProvider.Id);
+            return Ok();
+        }
+
+        [HttpPatch("ChangePhoneNumberRangesStartRanges")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ChangePhoneNumberRangesStartRanges([FromBody] EditPhoneNumberRangesStartRangesDTO editPhoneNumberRangesStartRangesDTO)
+        {
+            var paymentProvider = await _paymentProviderService.FindPaymentProviderByNameAsync(editPhoneNumberRangesStartRangesDTO.PaymentProviderName);
+            await _phoneNumberRangesService.EditPhoneNumberRangesStartRangesAsync(editPhoneNumberRangesStartRangesDTO, paymentProvider.Id);
+            return Ok();
+        }
+
+        [HttpPatch("ChangePhoneNumberRangesEndRanges")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> ChangePhoneNumberRangesEndRanges([FromBody] EditPhoneNumberRangesEndRangesDTO editPhoneNumberRangesEndRangesDTO)
+        {
+            var paymentProvider = await _paymentProviderService.FindPaymentProviderByNameAsync(editPhoneNumberRangesEndRangesDTO.PaymentProviderName);
+            await _phoneNumberRangesService.EditPhoneNumberRangesEndRangesAsync(editPhoneNumberRangesEndRangesDTO, paymentProvider.Id);
+            return Ok();
+        }
+
+        [HttpDelete("DeletePhoneNumberRanges")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeletePhoneNumberRanges([FromBody] DeletePhoneNumberRangeDTO deletePhoneNumberRangeDTO)
+        {
+            var paymentProvider = await _paymentProviderService.FindPaymentProviderByNameAsync(deletePhoneNumberRangeDTO.PaymentProviderName);
+            await _phoneNumberRangesService.DeletePhoneNumberRangesAsync(deletePhoneNumberRangeDTO, paymentProvider.Id);
+            return Ok();
+        }
+
+        [HttpGet("GetAllPhoneNumberRanges")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAllPhoneNumberRanges()
+        {
+            var phoneNumberRanges = await _phoneNumberRangesService.GetAllPhoneNumberRangesAsync();
+            return Ok(phoneNumberRanges);
+        }
+
+        [HttpGet("")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAllPaymentTransaction()
+        {
+            var paymentTransactions = await _paymentTransactionService.GetAllPaymentTransactionsAsync();
+            return Ok(paymentTransactions);
         }
     }
 }

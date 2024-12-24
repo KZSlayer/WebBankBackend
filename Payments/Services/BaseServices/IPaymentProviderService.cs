@@ -1,4 +1,4 @@
-﻿using Payments.DTOs;
+﻿using Payments.DTOs.PaymentProviderDTOs;
 using Payments.Models;
 
 namespace Payments.Services.BaseServices
@@ -11,6 +11,7 @@ namespace Payments.Services.BaseServices
         Task EditPaymentProviderServiceCategoryIdAsync(ChangePaymentProviderServiceCategoryIdDTO changePaymentProviderServiceCategoryIdDTO, int serviceCategoryId);
         Task RemovePaymentProviderAsync(string paymentProviderName);
         Task<List<PaymentProvider>> GetAllPaymentProviderAsync();
+        Task<PaymentProvider?> FindPaymentProviderByNameAsync(string name);
         Task<int?> FindServiceCategoryIdAsync(int providerID);
     }
 }

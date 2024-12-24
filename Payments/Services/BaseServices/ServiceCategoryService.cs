@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Payments.DTOs;
+using Payments.DTOs.ServiceCategoryDTOs;
 using Payments.Models;
 using Payments.Repositories;
 using Payments.Services.Exceptions;

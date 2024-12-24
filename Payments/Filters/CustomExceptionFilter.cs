@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Payments.Services.Exceptions;
 
 namespace Payments.Filters
@@ -27,6 +28,16 @@ namespace Payments.Filters
                 PaymentTransactionUpdateException => (404, "Транзакция не найдена."),
                 PaymentTransactionAddException => (500, "Ошибка добавления транзакции."),
                 UserNotAuthenticatedException => (401, "Ошибка! Пользователь не авторизирован."),
+                ServiceCategoryAlreadyExistException => (409, "Ошибка! Такая категория уже существует."),
+                ServiceCategoryNotFoundException => (404, "Ошибка! Такая категория отсутствует в базе."),
+                PhoneNumberRangeAlreadyExistException => (409, "Ошибка! Такой диапазон номеров уже существует."),
+                PhoneNumberRangeNotFoundException => (404, "Ошибка! Такой диапазон номеров отсутствует в базе."),
+                StartRangeGreaterThanEndRangeException => (400, "Ошибка! Начальный диапазон не может быть больше конечного диапазона существующего диапазона телефонных номеров."),
+                EndRangeLessThanStartRangeException => (400, "Ошибка! Конечный диапазон не может быть меньше начального диапазона существующего диапазона телефонных номеров."),
+                PaymentProviderAlreadyExistException => (409, "Ошибка! Такой провайдер уже существует в базе."),
+                PaymentProviderNotFoundException => (404, "Ошибка! Такой провайдер отсутствует в базе."),
+                DbUpdateException => (409, "Ошибка! Данные в базе данных не были обновленны."),
+                OperationCanceledException => (500, "Ошибка! Операция была отменена."),
                 _ => (500, "Произошла внутренняя ошибка сервера.")
             };
             var response = new

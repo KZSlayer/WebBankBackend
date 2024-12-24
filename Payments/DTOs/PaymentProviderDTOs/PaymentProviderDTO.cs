@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Payments.DTOs
+namespace Payments.DTOs.PaymentProviderDTOs
 {
     public class PaymentProviderDTO
     {

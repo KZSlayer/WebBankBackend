@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Payments.DTOs
+namespace Payments.DTOs.PaymentProviderDTOs
 {
-    public class ChangeServiceCategoryNameDTO
+    public class ChangePaymentProviderNameDTO
     {
         [Required]
         [StringLength(100)]

@@ -1,7 +1,7 @@
 ﻿
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
-using Payments.DTOs;
+using Payments.DTOs.KafkaDTOs;
 using Payments.Services.BaseServices;
 using System.Text.Json;
 

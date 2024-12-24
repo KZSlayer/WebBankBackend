@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Payments.DTOs;
+using Payments.DTOs.PaymentProviderDTOs;
 using Payments.Models;
 using Payments.Repositories;
 using Payments.Services.Exceptions;
@@ -20,7 +20,7 @@ namespace Payments.Services.BaseServices
                 var payment_provider = await _repository.SelectPaymentProviderByNameAsync(paymentProviderDTO.Name);
                 if (payment_provider != null)
                 {
-                    throw new PaymentProviderNotFoundException();
+                    throw new PaymentProviderAlreadyExistException();
                 }
                 var new_payment_provider = new PaymentProvider
                 {
@@ -30,7 +30,7 @@ namespace Payments.Services.BaseServices
                 };
                 await _repository.AddPaymentProviderAsync(new_payment_provider);
             }
-            catch (PaymentProviderNotFoundException)
+            catch (PaymentProviderAlreadyExistException)
             {
                 throw;
             }
@@ -148,7 +148,23 @@ namespace Payments.Services.BaseServices
         {
             return await _repository.SelectAllPaymentProviderAsync();
         }
-    public async Task<int?> FindServiceCategoryIdAsync(int providerID)
+        public async Task<PaymentProvider?> FindPaymentProviderByNameAsync(string name)
+        {
+            try
+            {
+                var paymentProvider = await _repository.SelectPaymentProviderByNameAsync(name);
+                if (paymentProvider == null)
+                {
+                    throw new PaymentProviderNotFoundException();
+                }
+                return paymentProvider;
+            }
+            catch (PaymentProviderNotFoundException)
+            {
+                throw;
+            }
+        }
+        public async Task<int?> FindServiceCategoryIdAsync(int providerID)
         {
             try
             {

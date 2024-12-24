@@ -1,4 +1,4 @@
-﻿using Payments.DTOs;
+﻿using Payments.DTOs.ServiceCategoryDTOs;
 using Payments.Models;
 
 namespace Payments.Services.BaseServices

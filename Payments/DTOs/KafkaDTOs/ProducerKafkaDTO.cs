@@ -1,4 +1,4 @@
-﻿namespace Payments.DTOs
+﻿namespace Payments.DTOs.KafkaDTOs
 {
     public class ProducerKafkaDTO
     {

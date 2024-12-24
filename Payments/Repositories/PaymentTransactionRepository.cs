@@ -50,6 +50,15 @@ namespace Payments.Repositories
                 throw new PaymentTransactionUpdateException("Операция обновления статуса транзакции была прервана.");
             }
         }
+        public async Task<List<PaymentTransaction>> SelectAllPaymentTransactionsAsync()
+        {
+            return await _context.payment_transactions.ToListAsync();
+        }
+
+        public async Task<List<PaymentTransaction>> SelectAllUserPaymentTransactionsAsync(int userId)
+        {
+            return await _context.payment_transactions.Where(pt => pt.UserId == userId).ToListAsync();
+        }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _context.Database.BeginTransactionAsync();

@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using Payments.DTOs;
+using Payments.DTOs.KafkaDTOs;
 using System.Text.Json;
 
 namespace Payments.Messaging

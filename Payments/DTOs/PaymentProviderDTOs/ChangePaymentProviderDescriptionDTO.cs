@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Payments.DTOs
+namespace Payments.DTOs.PaymentProviderDTOs
 {
     public class ChangePaymentProviderDescriptionDTO
     {
