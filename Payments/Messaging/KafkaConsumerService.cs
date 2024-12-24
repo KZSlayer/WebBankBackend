@@ -11,7 +11,8 @@ namespace Payments.Messaging
     {
         private readonly IConsumer<Null, string> consumer;
         private readonly IServiceScopeFactory serviceScopeFactory;
-        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory _serviceScopeFactory)
+        private readonly ILogger<KafkaConsumerService> _logger;
+        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory _serviceScopeFactory, ILogger<KafkaConsumerService> logger)
         {
             var config = new ConsumerConfig
             {
@@ -22,6 +23,7 @@ namespace Payments.Messaging
             };
             consumer = new ConsumerBuilder<Null, string>(config).Build();
             serviceScopeFactory = _serviceScopeFactory;
+            _logger = logger;
         }
 
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
@@ -35,6 +37,7 @@ namespace Payments.Messaging
                     {
                         var result = consumer.Consume();
                         var message = JsonSerializer.Deserialize<ConsumerKafkaDTO>(result.Message.Value);
+                        _logger.LogInformation($"Пришло сообщение из топика: {result.Topic} - содержащее следующие данные: {result.Message.Value}");
                         using (var scope = serviceScopeFactory.CreateScope())
                         {
                             var paymentTS = scope.ServiceProvider.GetRequiredService<IPaymentTransactionService>();
@@ -47,7 +50,6 @@ namespace Payments.Messaging
                                 await paymentTS.UpdatePaymentTransactionStatusAsync(message.PaymentTransactionId, "Отклонено");
                             }
                         }
-                        Console.WriteLine($"PaymentTransactionId: {message.PaymentTransactionId}\nSuccess: {message.Success}");
                         consumer.Commit();
                     }
                 }

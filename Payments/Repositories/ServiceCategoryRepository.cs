@@ -8,9 +8,11 @@ namespace Payments.Repositories
     public class ServiceCategoryRepository : IServiceCategoryRepository
     {
         private readonly PaymentsDbContext _context;
-        public ServiceCategoryRepository(PaymentsDbContext context)
+        private readonly ILogger<ServiceCategoryRepository> _logger;
+        public ServiceCategoryRepository(PaymentsDbContext context, ILogger<ServiceCategoryRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task AddServiceCategoryAsync(ServiceCategory serviceCategory)
@@ -20,12 +22,14 @@ namespace Payments.Repositories
                 await _context.service_categories.AddAsync(serviceCategory);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при добавлении категории! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при добавлении категории! Детали: {ex}");
                 throw;
             }
         }
@@ -36,12 +40,14 @@ namespace Payments.Repositories
                  _context.service_categories.Update(serviceCategory);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при обновлении категории! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при обновлении категории! Детали: {ex}");
                 throw;
             }
         }
@@ -52,12 +58,14 @@ namespace Payments.Repositories
                 _context.service_categories.Remove(serviceCategory);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при удалении категории! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при удалении категории! Детали: {ex}");
                 throw;
             }
         }

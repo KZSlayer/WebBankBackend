@@ -8,9 +8,11 @@ namespace Payments.Repositories
     public class PhoneNumberRangesRepository : IPhoneNumberRangesRepository
     {
         private readonly PaymentsDbContext _context;
-        public PhoneNumberRangesRepository(PaymentsDbContext context)
+        private readonly ILogger<PhoneNumberRangesRepository> _logger;
+        public PhoneNumberRangesRepository(PaymentsDbContext context, ILogger<PhoneNumberRangesRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task AddPhoneNumberRangesAsync(PhoneNumberRange phoneNumberRange)
@@ -20,12 +22,14 @@ namespace Payments.Repositories
                 await _context.phone_number_ranges.AddAsync(phoneNumberRange);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при добавлении диапазона номеров! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при добавлении диапазона номеров! Детали: {ex}");
                 throw;
             }
         }
@@ -37,12 +41,14 @@ namespace Payments.Repositories
                 _context.phone_number_ranges.Update(phoneNumberRange);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при обновлении диапазона номеров! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при обновлении диапазона номеров! Детали: {ex}");
                 throw;
             }
         }
@@ -54,12 +60,14 @@ namespace Payments.Repositories
                 _context.phone_number_ranges.Remove(phoneNumberRange);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при удалении диапазона номеров! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при удалении диапазона номеров! Детали: {ex}");
                 throw;
             }
         }

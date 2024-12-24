@@ -9,9 +9,11 @@ namespace Payments.Repositories
     public class PaymentTransactionRepository : IPaymentTransactionRepository
     {
         private readonly PaymentsDbContext _context;
-        public PaymentTransactionRepository(PaymentsDbContext context)
+        private readonly ILogger<PaymentTransactionRepository> _logger;
+        public PaymentTransactionRepository(PaymentsDbContext context, ILogger<PaymentTransactionRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task AddPaymentTransactionAsync(PaymentTransaction transaction)
@@ -21,12 +23,14 @@ namespace Payments.Repositories
                 await _context.payment_transactions.AddAsync(transaction);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Детали: {ex}");
                 throw new PaymentTransactionAddException("Ошибка при добавлении транзакции в базу данных.");
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при добавлении платежа в базу данных! Детали: {ex}");
                 throw new PaymentTransactionAddException("Операция добавления транзакции была прервана.");
             }
         }
@@ -41,12 +45,14 @@ namespace Payments.Repositories
                 _context.payment_transactions.Update(transaction);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Детали: {ex}");
                 throw new PaymentTransactionUpdateException("Ошибка при обновлении статуса транзакции.");
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при обновлении платежа в базе данных! Детали: {ex}");
                 throw new PaymentTransactionUpdateException("Операция обновления статуса транзакции была прервана.");
             }
         }

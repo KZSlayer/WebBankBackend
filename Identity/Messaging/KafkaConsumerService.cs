@@ -57,14 +57,14 @@ namespace Identity.Messaging
                                 await _producer.SendPhoneCheckResponseAsync("phone-response", phoneCheckResponse);
                                 break;
                             default:
-                                Console.WriteLine($"Неизвестный топик: {result.Topic}");
+                                _logger.LogWarning($"Неизвестный топик: {result.Topic}");
                                 break;
                         }
                     }
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogDebug("Потребление сообщений остановлено.");
+                    _logger.LogInformation("Потребление сообщений остановлено.");
                 }
             }, cancellationToken);
         }

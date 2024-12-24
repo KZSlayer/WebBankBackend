@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Payments.Data;
 using Payments.Models;
 
@@ -7,9 +8,11 @@ namespace Payments.Repositories
     public class PaymentProviderRepository : IPaymentProviderRepository
     {
         private readonly PaymentsDbContext _context;
-        public PaymentProviderRepository(PaymentsDbContext context)
+        private readonly ILogger<PaymentProviderRepository> _logger;
+        public PaymentProviderRepository(PaymentsDbContext context, ILogger<PaymentProviderRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task AddPaymentProviderAsync(PaymentProvider paymentProvider)
         {
@@ -18,12 +21,14 @@ namespace Payments.Repositories
                 await _context.payment_providers.AddAsync(paymentProvider);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при сохранении провайдера! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при сохранении провайдера! Детали: {ex}");
                 throw;
             }
         }
@@ -34,12 +39,14 @@ namespace Payments.Repositories
                 _context.payment_providers.Update(paymentProvider);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при обновлении провайдера! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при обновлении провайдера! Детали: {ex}");
                 throw;
             }
         }
@@ -50,12 +57,14 @@ namespace Payments.Repositories
                 _context.payment_providers.Remove(paymentProvider);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
+                _logger.LogError($"Ошибка при удалении провайдера! Детали: {ex}");
                 throw;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                _logger.LogError($"Ошибка при удалении провайдера! Детали: {ex}");
                 throw;
             }
         }
