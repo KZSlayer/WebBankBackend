@@ -1,4 +1,5 @@
 ﻿using Identity.DTOs;
+using Identity.Filters;
 using Identity.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace Identity.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ServiceFilter(typeof(CustomExceptionFilter))]
     public class LoginController : ControllerBase
     {
         private readonly IUserService _userService;

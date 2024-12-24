@@ -7,21 +7,24 @@ namespace Identity.Messaging
     public class KafkaProducerService : IKafkaProducerService
     {
         private readonly IProducer<string, string> _producer;
-        public KafkaProducerService(IConfiguration configuration)
+        private readonly ILogger<KafkaProducerService> _logger;
+        public KafkaProducerService(IConfiguration configuration, ILogger<KafkaProducerService> logger)
         {
             var config = new ProducerConfig
             {
                 BootstrapServers = configuration["Kafka:BootstrapServers"]
             };
             _producer = new ProducerBuilder<string, string>(config).Build();
+            _logger = logger;
         }
 
         public async Task SendMessageAsync(string topic, string userID)
         {
             try
             {
+                _logger.LogInformation($"Отправляем в топик: {topic} - следующие данные: {userID}");
                 var result = await _producer.ProduceAsync(
-                    topic, 
+                    topic,
                     new Message<string, string> 
                     {
                         Key = $"userId-{userID}",
@@ -30,7 +33,7 @@ namespace Identity.Messaging
             }
             catch (ProduceException<Null, int> ex)
             {
-                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+                _logger.LogError($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }
         }
         public async Task SendPhoneCheckResponseAsync(string topic, PhoneCheckResultDTO phoneCheckResultDTO)
@@ -38,7 +41,7 @@ namespace Identity.Messaging
             try
             {
                 var jsonMessage = JsonSerializer.Serialize(phoneCheckResultDTO);
-                Console.WriteLine(jsonMessage);
+                _logger.LogInformation($"Отправляем в топик: {topic} - следующие данные: {jsonMessage}");
                 var result = await _producer.ProduceAsync(
                     topic,
                     new Message<string, string>
@@ -49,7 +52,7 @@ namespace Identity.Messaging
             }
             catch (ProduceException<Null, int> ex)
             {
-                Console.WriteLine($"Ошибка отправки сообщения: {ex.Error.Reason}");
+                _logger.LogError($"Ошибка отправки сообщения: {ex.Error.Reason}");
             }
         }
     }

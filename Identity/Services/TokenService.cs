@@ -1,8 +1,10 @@
 ﻿using Identity.DTOs;
 using Identity.Models;
 using Identity.Repositories;
+using Identity.Repositories.Exceptions;
 using Identity.Security;
 using Identity.Services.Exceptions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,9 +14,11 @@ namespace Identity.Services
     public class TokenService : ITokenService
     {
         private readonly ITokenRepository _repository;
-        public TokenService(ITokenRepository repository)
+        private readonly ILogger<TokenService> _logger;
+        public TokenService(ITokenRepository repository, ILogger<TokenService> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
 
         public string GenerateAccessToken(User user)
@@ -77,68 +81,113 @@ namespace Identity.Services
         }
         public async Task<object> UpdateAccessTokenAsync(RefreshTokenDTO refreshTokenDTO)
         {
-            if (string.IsNullOrEmpty(refreshTokenDTO.RefreshToken) || string.IsNullOrEmpty(refreshTokenDTO.DeviceID))
+            try
             {
-                throw new ArgumentException();
+                if (string.IsNullOrEmpty(refreshTokenDTO.RefreshToken) || string.IsNullOrEmpty(refreshTokenDTO.DeviceID))
+                {
+                    throw new ArgumentException();
+                }
+
+                var userID = await ValidateRefreshTokenAsync(refreshTokenDTO.RefreshToken, refreshTokenDTO.DeviceID);
+                if (userID == null)
+                {
+                    throw new InvalidRefreshTokenException();
+                }
+
+                var user = new User { Id = userID.Value };
+
+                var newRefreshToken = GenerateRefreshToken(user, refreshTokenDTO.DeviceID);
+
+                var oldRefreshToken = await _repository.GetRefreshTokenAsync(refreshTokenDTO.RefreshToken, refreshTokenDTO.DeviceID);
+                oldRefreshToken.RevokedAt = DateTime.UtcNow;
+                await _repository.RevokeTokenAsync();
+
+                await _repository.AddRefreshTokenAsync(newRefreshToken);
+
+                var tokens = new
+                {
+                    access_token = GenerateAccessToken(user),
+                    refresh_token = newRefreshToken.Token,
+                };
+                return tokens;
             }
-            var userID = await ValidateRefreshTokenAsync(refreshTokenDTO.RefreshToken, refreshTokenDTO.DeviceID);
-            if (userID == null)
+            catch (ArgumentException)
             {
-                throw new InvalidRefreshTokenException();
+                _logger.LogError($"Ошибка в UpdateAccessTokenAsync! Переданы пустые аргументы!");
+                throw;
             }
-            var user = new User { Id = userID.Value };
-            var newRefreshToken = GenerateRefreshToken(user, refreshTokenDTO.DeviceID);
-            await InvalidationTokenAsync(user.Id, refreshTokenDTO.DeviceID);
-            await SaveRefreshTokenAsync(newRefreshToken);
-            var tokens = new
+            catch (InvalidRefreshTokenException)
             {
-                access_token = GenerateAccessToken(user),
-                refresh_token = newRefreshToken.Token,
-            };
-            return tokens;
+                _logger.LogError($"Ошибка в UpdateAccessTokenAsync! userID is null!");
+                throw;
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
         }
         public async Task<int?> ValidateRefreshTokenAsync(string refreshToken, string deviceID)
         {
-            try
+            var token = await _repository.GetRefreshTokenAsync(refreshToken, deviceID);
+            if (token == null)
             {
-                var token = await _repository.GetRefreshTokenAsync(refreshToken, deviceID);
-                if (token == null)
-                {
-                    return null;
-                }
-                return token.UserId;
+                return null;
             }
-            catch (Exception)
-            {
-                Console.WriteLine("Ошибка ValidateRefreshTokenAsync");
-                throw;
-            }
+            return token.UserId;
         }
         public async Task InvalidationAllTokensAsync(int userID)
         {
             var _transaction = await _repository.BeginTransactionAsync();
             try
             {
-                await _repository.RevokeAllTokensAsync(userID);
+                var tokens = await _repository.GetAllUserRefreshTokensAsync(userID);
+                foreach (var token in tokens)
+                {
+                    token.RevokedAt = DateTime.UtcNow;
+                }
+                await _repository.RevokeAllTokensAsync();
                 await _transaction.CommitAsync();
             }
-            catch (Exception)
+            catch (DbUpdateException)
             {
                 await _transaction.RollbackAsync();
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                await _transaction.RollbackAsync();
+                throw;
             }
         }
 
         public async Task InvalidationTokenAsync(int userID, string deviceID)
         {
-            var _transaction = await _repository.BeginTransactionAsync();
             try
             {
-                await _repository.RevokeTokenAsync(userID, deviceID);
-                await _transaction.CommitAsync();
+                var token = await _repository.GetRefreshTokenAsync(userID, deviceID);
+                if (token == null)
+                {
+                    throw new TokenNotFoundException();
+                }
+                token.RevokedAt = DateTime.UtcNow;
+                await _repository.RevokeTokenAsync();
             }
-            catch (Exception)
+            catch (TokenNotFoundException)
             {
-                await _transaction.RollbackAsync();
+                _logger.LogError($"Ошибка в InvalidationTokenAsync! token is null!");
+                throw;
+            }
+            catch (DbUpdateException)
+            {
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
         }
 
@@ -150,12 +199,14 @@ namespace Identity.Services
                 await _repository.AddRefreshTokenAsync(refreshToken);
                 await _transaction.CommitAsync();
             }
-            catch (Exception)
+            catch (DbUpdateException)
             {
-                Console.WriteLine("Ошибка SaveRefreshTokenAsync");
-                await _transaction.RollbackAsync();
+                throw;
             }
-            
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
         }
     }
 }

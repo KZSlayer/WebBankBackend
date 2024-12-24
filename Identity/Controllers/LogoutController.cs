@@ -1,4 +1,5 @@
 ﻿using Identity.DTOs;
+using Identity.Filters;
 using Identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ namespace Identity.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ServiceFilter(typeof(CustomExceptionFilter))]
     public class LogoutController : ControllerBase
     {
         private readonly ITokenService _tokenService;
@@ -16,7 +18,7 @@ namespace Identity.Controllers
         }
 
         [HttpPost("FromDevice")]
-        [Authorize]
+        [Authorize(Roles = "user, admin")]
         public async Task<IActionResult> LogoutFromDevice([FromBody] SignOutDTO signOutDTO)
         {
             await _tokenService.InvalidationTokenAsync(signOutDTO.UserID, signOutDTO.DeviceID);
@@ -24,7 +26,7 @@ namespace Identity.Controllers
         }
 
         [HttpPost("FromAllDevices")]
-        [Authorize]
+        [Authorize(Roles = "user, admin")]
         public async Task<IActionResult> LogoutFromAllDevices([FromBody] SignOutDTO signOutDTO)
         {
             await _tokenService.InvalidationAllTokensAsync(signOutDTO.UserID);

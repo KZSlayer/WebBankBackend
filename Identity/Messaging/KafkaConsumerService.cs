@@ -2,6 +2,7 @@
 using Identity.DTOs;
 using Identity.Models;
 using Identity.Services;
+using Identity.Services.Exceptions;
 using System.Text.Json;
 
 namespace Identity.Messaging
@@ -11,7 +12,8 @@ namespace Identity.Messaging
         private readonly IConsumer<string?, string> _consumer;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IKafkaProducerService _producer;
-        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer)
+        private readonly ILogger<KafkaConsumerService> _logger;
+        public KafkaConsumerService(IConfiguration configuration, IServiceScopeFactory serviceScopeFactory, IKafkaProducerService producer, ILogger<KafkaConsumerService> logger)
         {
             var config = new ConsumerConfig
             {
@@ -24,6 +26,7 @@ namespace Identity.Messaging
             _consumer = new ConsumerBuilder<string?, string>(config).Build();
             _serviceScopeFactory = serviceScopeFactory;
             _producer = producer;
+            _logger = logger;
         }
         public async Task StartConsumingAsync(CancellationToken cancellationToken)
         {
@@ -39,7 +42,7 @@ namespace Identity.Messaging
                     while (!cancellationToken.IsCancellationRequested)
                     {
                         var result = _consumer.Consume(cancellationToken);
-                        Console.WriteLine($"Получено сообщение из топика {result.Topic}: {result.Message.Value}");
+                        _logger.LogInformation($"Получено сообщение из топика {result.Topic} со следующими данными: {result.Message.Value}");
                         switch (result.Topic)
                         {
                             case "phone-query":
@@ -61,11 +64,11 @@ namespace Identity.Messaging
                 }
                 catch (OperationCanceledException)
                 {
-                    Console.WriteLine("Потребление сообщений остановлено.");
+                    _logger.LogDebug("Потребление сообщений остановлено.");
                 }
             }, cancellationToken);
         }
-        public async Task<User> FindUserByPhone(string phoneNumber, CancellationToken cancellationToken)
+        public async Task<User?> FindUserByPhone(string phoneNumber, CancellationToken cancellationToken)
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -81,8 +84,9 @@ namespace Identity.Messaging
                     return user;
                 }
             }
-            catch (Exception)
+            catch (UserNotFoundException)
             {
+                _logger.LogError("Пользователь не найден!");
                 return new User();
             }
         }

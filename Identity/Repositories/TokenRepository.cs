@@ -8,15 +8,30 @@ namespace Identity.Repositories
     public class TokenRepository : ITokenRepository
     {
         private readonly IdentityDbContext _context;
-        public TokenRepository(IdentityDbContext context)
+        private readonly ILogger<TokenRepository> _logger;
+        public TokenRepository(IdentityDbContext context, ILogger<TokenRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task AddRefreshTokenAsync(RefreshToken refreshToken)
         {
-            await _context.refresh_tokens.AddAsync(refreshToken);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.refresh_tokens.AddAsync(refreshToken);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! \nДетали:\n {ex.Message}");
+                throw;
+            }
+            catch (OperationCanceledException ex)
+            {
+                _logger.LogError($"Ошибка при добавлении refresh token в базу данных! \nДетали:\n {ex.Message}");
+                throw;
+            }
         }
 
         public async Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken, string deviceID)
@@ -27,31 +42,57 @@ namespace Identity.Repositories
                 && rt.ExpiryDate > DateTime.UtcNow
                 && rt.RevokedAt == null);
         }
-
-        public async Task RevokeTokenAsync(int userID, string deviceID)
+        public async Task<RefreshToken?> GetRefreshTokenAsync(int userID, string deviceID)
         {
             var token = await _context.refresh_tokens
                 .FirstOrDefaultAsync(rt => rt.User.Id == userID
                 && rt.DeviceID == deviceID
                 && rt.ExpiryDate > DateTime.UtcNow
                 && rt.RevokedAt == null);
-            if (token != null)
+            return token;
+        }
+        public async Task<List<RefreshToken>> GetAllUserRefreshTokensAsync(int userId)
+        {
+            var tokens = await _context.refresh_tokens
+                .Where(rt => rt.UserId == userId
+                && rt.ExpiryDate > DateTime.UtcNow
+                && rt.RevokedAt == null)
+                .ToListAsync();
+            return tokens;
+        }
+        public async Task RevokeTokenAsync()
+        {
+            try
             {
-                token.RevokedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
-        }
-        public async Task RevokeAllTokensAsync(int userID)
-        {
-            var tokens = _context.refresh_tokens
-                .Where(rt => rt.UserId == userID
-                && rt.ExpiryDate > DateTime.UtcNow
-                && rt.RevokedAt == null);
-            foreach (var token in tokens)
+            catch (DbUpdateException ex)
             {
-                token.RevokedAt = DateTime.UtcNow;
+                _logger.LogError($"Ошибка в базе данных при отзыве токена! \nДетали:\n {ex.Message}");
+                throw;
             }
-            await _context.SaveChangesAsync();
+            catch (OperationCanceledException ex)
+            {
+                _logger.LogError($"Ошибка в базе данных при отзыве токена! \nДетали:\n {ex.Message}");
+                throw;
+            }
+        }
+        public async Task RevokeAllTokensAsync()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! \nДетали:\n {ex.Message}");
+                throw;
+            }
+            catch (OperationCanceledException ex)
+            {
+                _logger.LogError($"Ошибка в базе данных при отзыве всех токенов! \nДетали:\n {ex.Message}");
+                throw;
+            }
         }
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
