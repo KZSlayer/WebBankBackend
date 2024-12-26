@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Payments.DTOs;
 using Payments.Filters;
 using Payments.Services;
@@ -18,6 +19,7 @@ namespace Payments.Controllers
         }
 
         [HttpPost("PayPhone")]
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> PayPhone([FromBody] PayPhoneDTO payPhoneDTO)
         {
             await _payPhoneService.PayPhoneAsync(payPhoneDTO);

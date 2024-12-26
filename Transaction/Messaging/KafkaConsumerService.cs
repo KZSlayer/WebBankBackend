@@ -1,5 +1,4 @@
 ﻿using Confluent.Kafka;
-using Microsoft.OpenApi.Models;
 using System.Text.Json;
 using Transaction.DTOs;
 using Transaction.Models;

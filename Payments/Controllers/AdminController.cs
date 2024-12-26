@@ -168,7 +168,7 @@ namespace Payments.Controllers
             return Ok(phoneNumberRanges);
         }
 
-        [HttpGet("")]
+        [HttpGet("GetAllPaymentTransaction")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllPaymentTransaction()
         {

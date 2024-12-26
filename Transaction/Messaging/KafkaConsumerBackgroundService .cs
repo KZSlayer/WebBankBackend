@@ -1,5 +1,4 @@
-﻿
-namespace Transaction.Messaging
+﻿namespace Transaction.Messaging
 {
     public class KafkaConsumerBackgroundService : BackgroundService
     {

@@ -49,6 +49,7 @@ builder.Services.AddSingleton<IKafkaConsumerService, KafkaConsumerService>();
 builder.Services.AddSingleton<IHostedService, KafkaConsumerBackgroundService>();
 builder.Services.AddScoped<CustomExceptionFilter>();
 builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

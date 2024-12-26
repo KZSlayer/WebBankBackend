@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<PaymentsDbContext>();
 builder.Services.AddScoped<IPhoneNumberRangesRepository, PhoneNumberRangesRepository>();
 builder.Services.AddScoped<IPhoneNumberRangesService, PhoneNumberRangesService>();

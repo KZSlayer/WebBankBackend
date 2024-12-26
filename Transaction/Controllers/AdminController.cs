@@ -27,7 +27,7 @@ namespace Transaction.Controllers
             return Ok();
         }
 
-        [HttpPost("EditTransactionType")]
+        [HttpPut("EditTransactionType")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> UpdateExistTransactionType([FromBody] ChangeTransactionTypeDTO changeTransactionTypeDTO)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Payments.Filters;
 using Payments.Services.BaseServices;
 
@@ -14,7 +15,8 @@ namespace Payments.Controllers
         {
             _paymentTransactionService = paymentTransactionService;
         }
-
+        [HttpGet("GetMyPaymentTransactions")]
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> GetAllUserPaymentTransactions()
         {
             var pt = await _paymentTransactionService.GetAllUserPaymentTransactionsAsync();
